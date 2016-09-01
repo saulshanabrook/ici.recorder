@@ -1,4 +1,4 @@
-# ici Recorder
+# `ici.recorder`
 
 For recording experiments at the [Institute for Computational Intelligence
 at Hampshire College](http://faculty.hampshire.edu/lspector/ici.html).
