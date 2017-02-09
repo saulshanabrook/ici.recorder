@@ -1,0 +1,96 @@
+message Run {
+  required Configuration config = 1;
+  repeated Generation generations = 2;
+}
+
+message Configuration {
+  required string problemFile = 1;
+  // arguments are stored as EDN export of clojure types
+  required map<string, string> arguments = 2;
+
+  required map<string, string> parameters = 3;
+
+  required string clojush_version = 4;
+  optional string git_commit = 5;
+
+  required double initialization_time = 6;
+}
+
+message Generation {
+  repeated Individual population = 1;
+
+  optional double reproduction_time = 2;
+  required double fitness_time = 3;
+  required double other_time = 4;
+  optional Report report = 5;
+}
+
+message Error {
+  // an error can be any number
+  optional float float = 1;
+  optional int32 int = 2;
+  optional double double = 3;
+}
+
+message Individual {
+  message PlushInstructionMap {
+    required string instruction = 1;
+    optional string UUID = 2;
+    optional bool random_insertion = 3;
+    optional bool silent = 4;
+    optional int32 random_closes = 5;
+    optional string parent_UUID = 6;
+  }
+
+  message PlushGenome {
+    repeated PlushInstructionMap genome = 1;
+  }
+  required PlushGenome genome = 1;
+  repeated string program = 2;
+  repeated Error errors = 3;
+  optional Error total_error = 4;
+  optional Error normalized_error = 5;
+  optional Error weighted_error = 6;
+  optional map<string, Error> meta_errors = 7;
+  repeated Error history = 8;
+  repeated PlushGenome ancestors = 9;
+  optional string uuid = 10;
+  repeated string parent_UUIDs = 11;
+  repeated string genetic_operators = 12;
+  optional bool is_random_replacement = 13;
+}
+
+message Report {
+  optional Individual best = 1;
+  optional Individual best_simplification = 2;
+
+  message Lexicase = {
+    repeated Error best_errors = 1;
+    optional Individual best_simplification = 2;
+  }
+  optional Lexicase lexicase = 3;
+
+  enum Outcome {
+    SUCCESS = 1;
+    FAILURE = 2;
+    CONTINUE = 3;
+  }
+  required Outcome outcome = 4;
+  optional double time = 5;
+
+  message ProblemSpecific = {
+    repeated Error best_generalization_errors = 1;
+  }
+  optional ProblemSpecific problem_specific = 6;
+
+}
+
+
+
+
+
+// excluded:
+// solution rates for historically  assessed hardness
+// elitegroups for elite group lexicase seelction
+// implicit fitnesss haring fitness
+// problem specific reports
