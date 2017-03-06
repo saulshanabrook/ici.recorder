@@ -9,3 +9,7 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
+*.DS_Store
+*.ipynb_checkpoints
+apache-drill-*
+parquet/*

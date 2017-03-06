@@ -1,0 +1,33 @@
+---
+# possibly saved as tasks/foo.yml
+
+- name: download alluxio
+  unarchive:
+    src: "http://alluxio.org/downloads/files/1.4.0/alluxio-1.4.0-bin.tar.gz"
+    remote_src: True
+    dest: /root/
+    creates: /root/alluxio-1.4.0
+- name: copy properties
+  template:
+    src: templates/alluxio-site.properties.j2
+    dest: /root/alluxio-1.4.0/conf/alluxio-site.properties
+  register: prop
+
+- name: install jdk
+  apt:
+    name: default-jdk
+# - copy:
+#     src: files/alluxio.service
+#     dest: /lib/systemd/system/alluxio.service
+# - systemd:
+#     name: alluxio.service
+#     enabled: False
+#     # state: restarted
+- name: stop alluxio
+  command: /root/alluxio-1.4.0/bin/alluxio-stop.sh all
+  when: prop.changed
+- name: start alluxio
+  command: /root/alluxio-1.4.0/bin/alluxio-start.sh local
+  when: prop.changed
+- name: run basic tests
+  command: /root/alluxio-1.4.0/bin/alluxio runTest Basic CACHE THROUGH

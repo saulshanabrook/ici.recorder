@@ -1,0 +1,3 @@
+[submodule "alluxio"]
+	path = alluxio
+	url = git://github.com/alluxio/alluxio.git

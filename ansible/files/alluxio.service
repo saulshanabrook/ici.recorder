@@ -1,0 +1,4 @@
+[Service]
+Type=forking
+ExecStart=/root/alluxio-1.4.0/bin/alluxio-start.sh local
+ExecStop=/root/alluxio-1.4.0/bin/alluxio-stop.sh all
