@@ -3,8 +3,13 @@
 For recording experiments at the [Institute for Computational Intelligence
 at Hampshire College](http://faculty.hampshire.edu/lspector/ici.html).
 
-Specifically, this means uploading the results of genetic programming
-runs to Google BigQuery, so that we can analyze them.
+
+## Current status
+
+This is currently being tested out at the lab. Once it is working, I will
+seperate out the Parquet writing clode into a seperate repo that is
+not specific to the lab.
+
 
 
 ## Data types
@@ -26,3 +31,10 @@ Clojure/Java, without writing more types than we need to.
 | `TIME` | `INT32` | `TIME_MILLIS` | `java.time.LocalTime` | Logical time, not including the date. Annotates int32. Number of milliseconds after midnight. |
 | `TIMESTAMP` | `INT64` | `TIMESTAMP_MILLIS` | `java.time.Instant` | Logical date and time. Annotates an int64 that stores the number of milliseconds from the Unix epoch, 00:00:00.000 on 1 January 1970, UTC.|
 | `INTERVAL` | `FIXED_LEN_BYTE_ARRAY` length 12 | `INTERVAL` | `java.time.Duration`| An interval of time. Annotates a fixed_len_byte_array of length 12. Months, days, and ms in unsigned little-endian encoding.|
+
+## installing alluxio jar
+
+```bash
+cd alluxio
+mvn install -Dhadoop.version=2.2.0 -DskipTests
+```

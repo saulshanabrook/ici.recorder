@@ -12,7 +12,31 @@
                 ;  [org.apache.hadoop/hadoop-common "2.7.3"]
                  [com.fzakaria/slf4j-timbre "0.3.4"]
                  [org.slf4j/log4j-over-slf4j "1.7.14"]
-                ;  [com.taoensso/timbre "4.8.0"]
-                 [org.alluxio/alluxio-core-client "1.4.0"]]
+                 [org.alluxio/alluxio-core-client "1.4.0"]
+                 [danlentz/clj-uuid "0.1.7"]
+                 [com.taoensso/tufte "1.1.1"]
+                 [com.taoensso/nippy "2.13.0"]
+                 [com.taoensso/timbre "4.8.0"]
+                 [environ "1.1.0"]]
+
+
                 ;  [com.google.guava/guava "21.0"]]
-  :main ici.test)
+  :main ici.test
+  :exclusions [org.slf4j/slf4j-log4j12]
+  :managed-dependencies [[org.apache.hadoop/hadoop-common "2.2.0"]]
+  :jvm-opts ^:replace ["-Xmx32G"]
+                      ;  "-XX:+UseConcMarkSweepGC"
+                      ;  "-XX:+CMSClassUnloadingEnabled"
+                      ;  "-Xverify:none"])
+                      ;  "-agentpath:/Users/saul/Downloads/YourKit-Java-Profiler-2017.02.app/Contents/Resources/bin/mac/libyjpagent.jnilib"]
+
+  ; :aot :all)
+  :release-tasks [["vcs" "assert-committed"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["change" "version" "leiningen.release/bump-version" "release"]
+                  ["shell" "git" "commit" "-am" "Version ${:version} [ci skip]"]
+                  ["vcs" "tag" "v" "--no-sign"] ; disable signing and add "v" prefix
+                  ["deploy"]
+                  ["change" "version" "leiningen.release/bump-version" "qualifier"]
+                  ["shell" "git" "commit" "-am" "Version ${:version} [ci skip]"]
+                  ["vcs" "push"]])

@@ -29,5 +29,7 @@
 - name: start alluxio
   command: /root/alluxio-1.4.0/bin/alluxio-start.sh local
   when: prop.changed
+- name: check consistancy
+  command: /root/alluxio-1.4.0/bin/alluxio fs checkConsistency /
 - name: run basic tests
   command: /root/alluxio-1.4.0/bin/alluxio runTest Basic CACHE THROUGH

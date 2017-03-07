@@ -14,13 +14,18 @@
 
 # Common properties
 alluxio.master.hostname={{inventory_hostname}}
+alluxio.master.web.hostname={{inventory_hostname}}
+alluxio.worker.hostname={{inventory_hostname}}
+alluxio.worker.web.hostname={{inventory_hostname}}
 alluxio.underfs.address={{underfs}}
 
 # Security properties
-alluxio.security.authorization.permission.enabled=false
-alluxio.security.authentication.type=NOSASL
+#alluxio.security.authorization.permission.enabled=false
+#alluxio.security.authentication.type=SIMPLE
 # use username as group for user logging in
 alluxio.security.group.mapping.class=alluxio.security.group.provider.IdentityUserGroupsMapping
+#alluxio.security.login.username=root
+alluxio.security.authorization.permission.umask=000
 
 # Worker properties
 # alluxio.worker.memory.size=1GB
@@ -31,8 +36,6 @@ alluxio.security.group.mapping.class=alluxio.security.group.provider.IdentityUse
 # User properties
 # alluxio.user.file.readtype.default=CACHE_PROMOTE
 # write files directly to understorage, no cache
-alluxio.user.file.writetype.default=THROUGH
-
-
+# alluxio.user.file.writetype.default=THROUGH
 
 alluxio.debug=true
