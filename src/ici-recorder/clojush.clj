@@ -1,4 +1,4 @@
-(ns ici.clojush
+(ns ici-recorder.clojush
   (:require [ici.parquet]
             [environ.core])
   (:import (org.apache.hadoop.fs)
@@ -21,15 +21,15 @@
               ; "alluxio.security.authorization.permission.enabled" "false"}}))
               ; "alluxio.security.authentication.type" "NOSASL"}}))
 
-(def -uri (java.net.URI. (environ.core/env :clojush-uri "")))
+(def -uri (java.net.URI. (environ.core/env :clojush-parquet-uri "")))
 (def -config-uri (.resolve -uri "configs/"))
 (def -generations-uri (.resolve -uri "generations/"))
-(defn record-config [uuid config]
+(defn record-run [uuid config]
   (-write
-    (org.apache.hadoop.fs.Path. (.resolve -config-uri (str uuid "/data.parquet")))
+    (org.apache.hadoop.fs.Path. (.resolve -config-uri (str "uuid=" uuid "/data.parquet")))
     config))
 
 (defn record-generation [config-uuid index generation]
   (-write
-    (org.apache.hadoop.fs.Path. (.resolve -generations-uri (str config-uuid "/" index "/data.parquet")))
+    (org.apache.hadoop.fs.Path. (.resolve -generations-uri (str "run-uuid=" config-uuid "/" "index=" index "/data.parquet")))
     generation))

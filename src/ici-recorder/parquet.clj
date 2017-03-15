@@ -1,8 +1,7 @@
-(ns ici.parquet
+(ns ici-recorder.parquet
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
-            [java-time]
-            [taoensso.timbre.profiling  :refer (pspy p defnp profile)])
+            [java-time])
   (:import (org.apache.parquet.schema)
            (clojure.lang)
            (org.apache.parquet.hadoop.api)
@@ -261,7 +260,7 @@
 ; (def ->parquet-writer (memoize -->parquet-writer))
 
 (defn write- [form options]
-  (let [schema (p :schema (->schema-root form "root"))
-        ^org.apache.parquet.hadoop.ParquetWriter parquet-writer (p :writer (->parquet-writer schema options))]
-    (p :write (.write parquet-writer form))
-    (p :close (.close parquet-writer))))
+  (let [schema (->schema-root form "root")
+        ^org.apache.parquet.hadoop.ParquetWriter parquet-writer (->parquet-writer schema options)]
+    (.write parquet-writer form)
+    (.close parquet-writer)))

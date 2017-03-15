@@ -3,13 +3,17 @@
 For recording experiments at the [Institute for Computational Intelligence
 at Hampshire College](http://faculty.hampshire.edu/lspector/ici.html).
 
+*This is currently a proof of concept. If it works out, then I will clean up code, add some tests, and extract reusable contents to another repo*
+## Usage
 
-## Current status
+Set the `CLOJUSH-PARQUET-URI` to a local path (`clojush/`) or a HDFS path
+(`alluxio://192.55.555.55:19998/clojush/`)
 
-This is currently being tested out at the lab. Once it is working, I will
-seperate out the Parquet writing clode into a seperate repo that is
-not specific to the lab.
-
+```clojure
+(require 'ici-recorder)
+(ici-recorder/record-run uuid config)
+(ici-recorder/record-generation uuid generation-number config)
+```
 
 
 ## Data types
@@ -32,7 +36,8 @@ Clojure/Java, without writing more types than we need to.
 | `TIMESTAMP` | `INT64` | `TIMESTAMP_MILLIS` | `java.time.Instant` | Logical date and time. Annotates an int64 that stores the number of milliseconds from the Unix epoch, 00:00:00.000 on 1 January 1970, UTC.|
 | `INTERVAL` | `FIXED_LEN_BYTE_ARRAY` length 12 | `INTERVAL` | `java.time.Duration`| An interval of time. Annotates a fixed_len_byte_array of length 12. Months, days, and ms in unsigned little-endian encoding.|
 
-## installing alluxio jar
+## Development
+### installing alluxio jar
 
 ```bash
 cd alluxio
