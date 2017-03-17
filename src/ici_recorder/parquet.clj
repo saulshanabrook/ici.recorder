@@ -1,7 +1,5 @@
 (ns ici-recorder.parquet
-  (:require [clojure.spec :as s]
-            [clojure.spec.gen :as gen]
-            [java-time])
+  (:require [java-time])
   (:import (org.apache.parquet.schema)
            (clojure.lang)
            (org.apache.parquet.hadoop.api)
@@ -12,6 +10,34 @@
            (org.apache.hadoop.fs)
            (org.apache.parquet.io.api)
            (java.time)))
+
+(defprotocol WriteParquet
+  (->schema [self ^String name_ ^org.apache.parquet.schema.Type$Repetition repitition])
+  (->schema-root [self ^String name_])
+  (add-value [self
+              ^org.apache.parquet.io.api.RecordConsumer record-consumer
+              ^org.apache.parquet.schema.Type schema])
+  (add-value-root [self
+                   ^org.apache.parquet.io.api.RecordConsumer record-consumer
+                   ^org.apache.parquet.schema.Type schema]))
+
+
+
+(defn -primitive-schema
+  ([name_ repitition primitive] (-primitive-schema name_ repitition primitive  nil))
+  ([name_ repitition primitive original] (-primitive-schema name_ repitition primitive  original 0))
+  ([name_ repitition primitive original length]
+   (org.apache.parquet.schema.PrimitiveType.
+     repitition
+     (Enum/valueOf org.apache.parquet.schema.PrimitiveType$PrimitiveTypeName primitive)
+     length
+     name_
+     (when original (Enum/valueOf org.apache.parquet.schema.OriginalType original)))))
+
+
+(defn string-schema [name_ repitition]
+  (-primitive-schema name_ repitition "BINARY" "UTF8"))
+
 
 (defprotocol UnionType
   (union [self other]))
@@ -25,71 +51,105 @@
     (into-array Class [org.apache.parquet.schema.Type])))
 (.setAccessible -union-primitive true)
 
-(def ^java.lang.reflect.Method -union-group
-  (.getDeclaredMethod
-    org.apache.parquet.schema.GroupType
-    "union"
-    (into-array Class [org.apache.parquet.schema.Type])))
-(.setAccessible -union-group true)
-
+(defn merge-fields
+  "returns a list of the fields merged for these types"
+  [^org.apache.parquet.schema.GroupType gt1
+   ^org.apache.parquet.schema.GroupType gt2]
+  (concat
+    (for [f1 (.getFields gt1)
+          :let [n1 (.getName f1)]]
+      (if (.containsField gt2 n1)
+        (union f1 (.getType gt2 n1))
+        f1))
+    (for [f2 (.getFields gt2)
+          :let [n2 (.getName f2)]
+          :when (not (.containsField gt1 n2))]
+      f2)))
 (extend-protocol UnionType
   org.apache.parquet.schema.PrimitiveType
     (union [self other]
-      (.invoke -union-primitive self (into-array [other])))
+      (if other
+        (try
+          (.invoke -union-primitive self (into-array [other]))
+          (catch java.lang.reflect.InvocationTargetException _
+            (string-schema
+              (.getName other)
+              (.getRepetition other))))
+        self))
 
   org.apache.parquet.schema.GroupType
     (union [self other]
-      (.invoke -union-group self (into-array [other]))))
+      (if other
+        (if self
+          (org.apache.parquet.schema.GroupType.
+            (.getRepetition other)
+            (.getName other)
+            (merge-fields self other))
+          other)
+        self))
+
+  nil
+    (union [_ other]
+      other))
 
 
-(defprotocol WriteParquet
-  (->schema [self ^String name_ ^org.apache.parquet.schema.Type$Repetition repitition])
-  (->schema-root [self ^String name_])
-  (add-value [self
-              ^org.apache.parquet.io.api.RecordConsumer record-consumer
-              ^org.apache.parquet.schema.Type schema])
-  (add-value-root [self
-                   ^org.apache.parquet.io.api.RecordConsumer record-consumer
-                   ^org.apache.parquet.schema.Type schema]))
-
-(defn -primitive-schema
-  ([name_ repitition primitive] (-primitive-schema name_ repitition primitive  nil))
-  ([name_ repitition primitive original] (-primitive-schema name_ repitition primitive  original 0))
-  ([name_ repitition primitive original length]
-   (org.apache.parquet.schema.PrimitiveType.
-     repitition
-     (Enum/valueOf org.apache.parquet.schema.PrimitiveType$PrimitiveTypeName primitive)
-     length
-     name_
-     (when original (Enum/valueOf org.apache.parquet.schema.OriginalType original)))))
+(defn map-key [key]
+  (if (keyword? key)
+    (name key)
+    (str (map name key))))
 
 (defn -map->field-schemas ^java.util.List [m]
-  (for [[k v] m]
-    (->schema v (name k) org.apache.parquet.schema.Type$Repetition/OPTIONAL)))
+  (for [[k v] m
+        :let [s (->schema v (map-key k) org.apache.parquet.schema.Type$Repetition/OPTIONAL)]
+        :when s]
+    s))
 
+
+(defn -add-value-wrapped
+  "wraps add-value, to see if the schemas is a string. if so, first converts
+   value to a string"
+  [form
+   ^org.apache.parquet.io.api.RecordConsumer record-consumer
+   ^org.apache.parquet.schema.Type schema]
+  (add-value
+    (if (= (.getOriginalType schema)
+           org.apache.parquet.schema.OriginalType/UTF8)
+      (str form)
+      form)
+    record-consumer
+    schema))
 (defn -add-map-fields [m ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.GroupType schema]
   (dotimes [i (.getFieldCount schema)]
     (let [inner-schema (.getType schema i)
           name_ (.getName inner-schema)
           form ((keyword name_) m)]
-      (when form
+      (when (and (some? form)
+                 (if (seq? form)
+                   (not-empty form)
+                   true))
         (.startField record-consumer name_ i)
-        (add-value form record-consumer inner-schema)
+        (-add-value-wrapped form record-consumer inner-schema)
         (.endField record-consumer name_ i)))))
 
 (defn seq->schema [s name_]
   (->> (for [f s] (->schema f name_ org.apache.parquet.schema.Type$Repetition/REPEATED))
-    (reduce union)))
+    (reduce union nil)))
 
 (defn -add-seq-value [s record-consumer schema]
-  (doseq [f s] (add-value f record-consumer schema)))
+  (doseq [f s] (-add-value-wrapped f record-consumer schema)))
 
 (extend-protocol WriteParquet
-  Long
+  java.lang.Long
     (->schema [_ ^String name_ ^org.apache.parquet.schema.Type$Repetition repitition]
       (-primitive-schema name_ repitition "INT64"))
     (add-value [self ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.Type _]
       (.addLong record-consumer self))
+
+  java.lang.Integer
+    (->schema [_ ^String name_ ^org.apache.parquet.schema.Type$Repetition repitition]
+      (-primitive-schema name_ repitition "INT32"))
+    (add-value [self ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.Type _]
+      (.addInteger record-consumer self))
 
   Double
     (->schema [_ ^String name_ ^org.apache.parquet.schema.Type$Repetition repitition]
@@ -105,7 +165,7 @@
 
   String
     (->schema [_ ^String name_ ^org.apache.parquet.schema.Type$Repetition repitition]
-      (-primitive-schema name_ repitition "BINARY" "UTF8"))
+      (string-schema name_ repitition))
     (add-value [self ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.Type _]
       (->> self
         org.apache.parquet.io.api.Binary/fromString
@@ -113,9 +173,15 @@
 
   clojure.lang.Keyword
     (->schema [self ^String name_ ^org.apache.parquet.schema.Type$Repetition repitition]
-      (->schema (name self) name_ repitition))
+      (->schema "" name_ repitition))
     (add-value [self ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.Type schema]
       (add-value (name self) record-consumer schema))
+
+
+  Object
+    (->schema [self ^String name_ ^org.apache.parquet.schema.Type$Repetition repitition]
+      (string-schema name_ repitition))
+
 
   java.time.LocalDate
     (->schema [_ ^String name_ ^org.apache.parquet.schema.Type$Repetition repitition]
@@ -155,7 +221,7 @@
         org.apache.parquet.io.api.Binary/fromConstantByteArray
         (.addBinary record-consumer)))
 
-  clojure.lang.IPersistentList
+  java.util.Collection
     ; (->schema [self ^String name_]
     ;   (->> (map ->schema self (repeat "element"))
     ;     (reduce union)
@@ -179,43 +245,25 @@
     (add-value [self ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.Type schema]
       (-add-seq-value self record-consumer schema))
 
-  clojure.lang.PersistentVector
-    (->schema [self ^String name_ _]
-      (seq->schema self ^String name_))
-    (add-value [self ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.Type schema]
-      (-add-seq-value self record-consumer schema))
-
-
-  clojure.lang.APersistentMap
+  java.util.Map
     (->schema [self ^String name_ ^org.apache.parquet.schema.Type$Repetition repitition]
       (org.apache.parquet.schema.GroupType. repitition name_ (-map->field-schemas self)))
     (->schema-root [self ^String name_]
       (org.apache.parquet.schema.MessageType. name_ (-map->field-schemas self)))
 
     (add-value [self ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.Type schema]
-      (.startGroup record-consumer)
-      (-add-map-fields self record-consumer schema)
-      (.endGroup record-consumer))
+      (when-not (.isEmpty self)
+        (.startGroup record-consumer)
+        (-add-map-fields self record-consumer schema)
+        (.endGroup record-consumer)))
     (add-value-root [self ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.Type schema]
       (.startMessage record-consumer)
       (-add-map-fields self record-consumer schema)
-      (.endMessage record-consumer)))
+      (.endMessage record-consumer))
 
-(def data
-  {:an-int 123
-   :another-int 2332
-   :a-double 232.2323
-   :a-boolean true
-   :a-group {:bool true :another 343}
-   :a-string "hie"
-   :a-date (java-time/local-date)
-   :time (java-time/local-time)
-   :a-list '({:hi 1} {:hi 2} {:there 3})
-   :primitive-list '(1 2 3)
-   :vector [true false]
-   :vector-2 [{:inner-vec [{:hi 1}]}
-              {:first 123 :inner-vec [{:there 2 :hi 3}]}]})
-
+  nil
+    (->schema [_ _ _]
+      nil))
 (defn ->write-context [schema]
   (org.apache.parquet.hadoop.api.WriteSupport$WriteContext. schema {}))
 
@@ -257,7 +305,6 @@
     ; (.withWriterVersion org.apache.parquet.column.ParquetProperties$WriterVersion/PARQUET_2_0)
     .build))
 
-; (def ->parquet-writer (memoize -->parquet-writer))
 
 (defn write- [form options]
   (let [schema (->schema-root form "root")

@@ -4,17 +4,19 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
-                ;  [proto-repl "0.3.1"]
+                 [proto-repl "0.3.1"]
                  [clojure.java-time "0.2.2"]
                  [org.apache.parquet/parquet-hadoop "1.9.0"]
                  [com.fzakaria/slf4j-timbre "0.3.4"]
                  [org.slf4j/log4j-over-slf4j "1.7.14"]
                  [org.alluxio/alluxio-core-client "1.4.0"]
-                 [environ "1.1.0"]]
+                 [environ "1.1.0"]
+                 [potemkin "0.4.3"]
+                 [proto-repl-sayid "0.1.3"]]
 
   :exclusions [org.slf4j/slf4j-log4j12]
   :managed-dependencies [[org.apache.hadoop/hadoop-common "2.2.0"]]
-  :jvm-opts ^:replace ["-Xmx32G"]
+  ; :jvm-opts ^:replace ["-Xmx32G"]
                       ;  "-XX:+UseConcMarkSweepGC"
                       ;  "-XX:+CMSClassUnloadingEnabled"
                       ;  "-Xverify:none"])

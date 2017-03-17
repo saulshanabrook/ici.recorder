@@ -13,3 +13,6 @@ pom.xml.asc
 *.ipynb_checkpoints
 apache-drill-*
 parquet/*
+clojush/
+configs/
+generations/

@@ -1,14 +1,14 @@
 (ns ici-recorder.clojush
-  (:require [ici.parquet]
+  (:require [ici-recorder.parquet]
             [environ.core])
   (:import (org.apache.hadoop.fs)
            (java.net)))
 
 (defn -write [path form]
-  (ici.parquet/write-
+  (ici-recorder.parquet/write-
     form
     {:path path
-     :write-mode "CREATE"
+     :write-mode "OVERWRITE"
      :validation false
      :compression-codec "GZIP"
      :hadoop {"fs.alluxio.impl" "alluxio.hadoop.FileSystem"
@@ -31,5 +31,5 @@
 
 (defn record-generation [config-uuid index generation]
   (-write
-    (org.apache.hadoop.fs.Path. (.resolve -generations-uri (str "run-uuid=" config-uuid "/" "index=" index "/data.parquet")))
+    (org.apache.hadoop.fs.Path. (.resolve -generations-uri (str "uuid=" config-uuid "/" "index=" index "/data.parquet")))
     generation))

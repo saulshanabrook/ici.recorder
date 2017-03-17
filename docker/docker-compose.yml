@@ -1,0 +1,18 @@
+version: '2'
+services:
+  apache-drill:
+    build: apache-drill
+    ports:
+     - "8047:8047"
+    tty: true
+  alluxio:
+    build: alluxio
+    volumes:
+      # - ./storage:/tmp/storage
+      - ./underfs:/tmp/underfs
+      # - ./journal:/tmp/alluxio-1.4.0/journal/
+      # - ./logs:/tmp/alluxio-1.4.0/logs
+    ports:
+      - "19999:19999"
+      - "30000:30000"
+      - "19998:19998"

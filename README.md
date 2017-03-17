@@ -25,16 +25,17 @@ Clojure/Java, without writing more types than we need to.
 
 
 
-| SQL Type | Parquet Type  | Parquet Logical Type | Clojure/Java Type | Description |
-| ------------ | -------------- | -------------------- | -------- | -- |
-| `BIGINT`  | `INT64` | | `Long` | 8-byte signed integer |
-| `BOOLEAN` | `BOOLEAN`| | `Boolean`| TRUE (1) or FALSE (0) |
-| `DOUBLE` | `DOUBLE` | | `Double` | 8-byte double precision floating point number |
-| `VARCHAR` | `BINARY` | `UTF8` | `String` | Annotates the binary primitive type. The byte array is interpreted as a UTF-8 encoded character string. |
-| `DATE` | `INT32` | `DATE` | `java.time.LocalDate` | Date, not including time of day. Uses the int32 annotation. Stores the number of days from the Unix epoch, 1 January 1970. |
-| `TIME` | `INT32` | `TIME_MILLIS` | `java.time.LocalTime` | Logical time, not including the date. Annotates int32. Number of milliseconds after midnight. |
-| `TIMESTAMP` | `INT64` | `TIMESTAMP_MILLIS` | `java.time.Instant` | Logical date and time. Annotates an int64 that stores the number of milliseconds from the Unix epoch, 00:00:00.000 on 1 January 1970, UTC.|
-| `INTERVAL` | `FIXED_LEN_BYTE_ARRAY` length 12 | `INTERVAL` | `java.time.Duration`| An interval of time. Annotates a fixed_len_byte_array of length 12. Months, days, and ms in unsigned little-endian encoding.|
+| SQL Type    | Parquet Type                     | Parquet Logical Type | Clojure/Java Type             | Description                                                                                                                                |
+|:------------|:---------------------------------|:---------------------|:------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------|
+| `INTEGER`    | `INT32`                          |                      | `Integer`                        | 8-byte signed integer                                                                                                                      |
+| `BIGINT`    | `INT64`                          |                      | `Long`                        | 8-byte signed integer                                                                                                                      |
+| `BOOLEAN`   | `BOOLEAN`                        |                      | `Boolean`                     | TRUE (1) or FALSE (0)                                                                                                                      |
+| `DOUBLE`    | `DOUBLE`                         |                      | `Double`                      | 8-byte double precision floating point number                                                                                              |
+| `VARCHAR`   | `BINARY`                         | `UTF8`               | `String`, `Symbol`, functions | Annotates the binary primitive type. The byte array is interpreted as a UTF-8 encoded character string.                                    |
+| `DATE`      | `INT32`                          | `DATE`               | `java.time.LocalDate`         | Date, not including time of day. Uses the int32 annotation. Stores the number of days from the Unix epoch, 1 January 1970.                 |
+| `TIME`      | `INT32`                          | `TIME_MILLIS`        | `java.time.LocalTime`         | Logical time, not including the date. Annotates int32. Number of milliseconds after midnight.                                              |
+| `TIMESTAMP` | `INT64`                          | `TIMESTAMP_MILLIS`   | `java.time.Instant`           | Logical date and time. Annotates an int64 that stores the number of milliseconds from the Unix epoch, 00:00:00.000 on 1 January 1970, UTC. |
+| `INTERVAL`  | `FIXED_LEN_BYTE_ARRAY` length 12 | `INTERVAL`           | `java.time.Duration`          | An interval of time. Annotates a fixed_len_byte_array of length 12. Months, days, and ms in unsigned little-endian encoding.               |
 
 ## Development
 ### installing alluxio jar
