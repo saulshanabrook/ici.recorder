@@ -9,7 +9,7 @@
     form
     {:path path
      :write-mode "OVERWRITE"
-     :validation false
+     :validation true
      :compression-codec "GZIP"
      :hadoop {"fs.alluxio.impl" "alluxio.hadoop.FileSystem"
               "fs.alluxio-ft.impl" "alluxio.hadoop.FaultTolerantFileSystem"
