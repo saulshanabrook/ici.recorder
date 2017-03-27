@@ -34,6 +34,12 @@
 
       (t/testing "for inner types"
         (t/is (= (->s [{:hi 1} {:hi true}])
+                 (->s [{:hi ""}]))))
+      (t/testing "for collection and primitive"
+        (t/is (= (->s [{:hi 1} 12])
+                 (->s [""])))
+        (t/is (= (->s [{:hi [1]}
+                       {:hi 1}])
                  (->s [{:hi ""}]))))))
   (t/testing "for maps"
     (t/testing "not same as collection"

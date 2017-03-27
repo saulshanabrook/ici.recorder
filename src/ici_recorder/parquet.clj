@@ -81,10 +81,12 @@
     (union [self other]
       (if other
         (if self
-          (org.apache.parquet.schema.GroupType.
-            (.getRepetition other)
-            (.getName other)
-            (merge-fields self other))
+          (if (instance? org.apache.parquet.schema.GroupType other)
+            (org.apache.parquet.schema.GroupType.
+              (.getRepetition other)
+              (.getName other)
+              (merge-fields self other))
+            (string-schema (.getName self) (.getRepetition self)))
           other)
         self))
 
