@@ -113,6 +113,7 @@
   [form
    ^org.apache.parquet.io.api.RecordConsumer record-consumer
    ^org.apache.parquet.schema.Type schema]
+  ; (println schema)
   (add-value
     (if (= (.getOriginalType schema)
            org.apache.parquet.schema.OriginalType/UTF8)
@@ -134,11 +135,30 @@
         (.endField record-consumer name_ i)))))
 
 (defn seq->schema [s name_]
-  (->> (for [f s] (->schema f name_ org.apache.parquet.schema.Type$Repetition/REPEATED))
-    (reduce union nil)))
+  (let [schema (->> (for [f s] (->schema f "element" org.apache.parquet.schema.Type$Repetition/OPTIONAL))
+                  (reduce union nil))]
+    (if schema
+      (org.apache.parquet.schema.ConversionPatterns/listOfElements
+        org.apache.parquet.schema.Type$Repetition/OPTIONAL
+        name_
+        schema)
+      nil)))
 
 (defn -add-seq-value [s record-consumer schema]
-  (doseq [f s] (-add-value-wrapped f record-consumer schema)))
+  (when (not-empty s)
+    (.startGroup record-consumer)
+    (.startField record-consumer "list" 0)
+
+    (let [inner-schema (-> schema (.getType 0) (.getType 0))]
+      (doseq [f s]
+        (.startGroup record-consumer)
+        (.startField record-consumer "element" 0)
+        (-add-value-wrapped f record-consumer inner-schema)
+        (.endField record-consumer "element" 0)
+        (.endGroup record-consumer)))
+
+    (.endField record-consumer "list" 0)
+    (.endGroup record-consumer)))
 
 (extend-protocol WriteParquet
   java.lang.Long
@@ -224,24 +244,6 @@
         (.addBinary record-consumer)))
 
   java.util.Collection
-    ; (->schema [self ^String name_]
-    ;   (->> (map ->schema self (repeat "element"))
-    ;     (reduce union)
-    ;     (org.apache.parquet.schema.ConversionPatterns/listOfElements
-    ;       -default-repition
-    ;       name_)))
-    ; (add-value [self ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.Type]
-    ;   (.startGroup record-consumer)
-    ;   (.startField record-consumer "list" 0)
-    ;   (dorun
-    ;     (map
-    ;       (fn [form]
-    ;         (.startGroup record-consumer)
-    ;         (-add-field record-consumer 0 ["element" form])
-    ;         (.endGroup record-consumer))
-    ;       self))
-    ;   (.endField record-consumer "list" 0)
-    ;   (.endGroup record-consumer))
     (->schema [self ^String name_ _]
       (seq->schema self ^String name_))
     (add-value [self ^org.apache.parquet.io.api.RecordConsumer record-consumer ^org.apache.parquet.schema.Type schema]
