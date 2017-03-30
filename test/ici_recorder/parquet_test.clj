@@ -3,8 +3,8 @@
             [clojure.test :as t]))
 
 
-(defn ->s [s]
-  (ici-recorder.parquet/->schema s "name" org.apache.parquet.schema.Type$Repetition/OPTIONAL))
+(defn ->s [f]
+  (ici-recorder.parquet/->schema f "name" org.apache.parquet.schema.Type$Repetition/OPTIONAL))
 
 (defrecord Person [name])
 
