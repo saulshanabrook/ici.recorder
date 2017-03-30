@@ -102,7 +102,8 @@
 
 (defn -map->field-schemas ^java.util.List [m]
   (for [[k v] m
-        :let [s (->schema v (map-key k) org.apache.parquet.schema.Type$Repetition/OPTIONAL)]
+        :let [name_ (map-key k)
+              s (->schema v name_ org.apache.parquet.schema.Type$Repetition/OPTIONAL)]
         :when s]
     s))
 
