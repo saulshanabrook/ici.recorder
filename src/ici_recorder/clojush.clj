@@ -34,5 +34,5 @@
 (defn record-generation [schema config-uuid index generation]
   (-write
     schema
-    (.resolve -generations-uri (str "uuid=" config-uuid "/" "index=" index "/data.parquet"))
+    (.resolve -generations-uri (str "run-uuid=" config-uuid "/" "index=" index "/data.parquet"))
     generation))
