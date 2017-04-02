@@ -1,13 +1,14 @@
 (ns ici-recorder.clojush
-  (:require [ici-recorder.parquet]
+  (:require [ici-recorder.parquet.write :refer [write]]
             [environ.core])
   (:import (org.apache.hadoop.fs)
            (java.net)))
 
-(defn -write [path form]
-  (ici-recorder.parquet/write-
+(defn -write [schema path form]
+  (write
+    schema
     form
-    {:path path
+    {:path (org.apache.hadoop.fs.Path. path)
      :write-mode "OVERWRITE"
      :validation true
      :compression-codec "GZIP"
@@ -24,12 +25,14 @@
 (def -uri (java.net.URI. (environ.core/env :clojush-parquet-uri "")))
 (def -config-uri (.resolve -uri "configs/"))
 (def -generations-uri (.resolve -uri "generations/"))
-(defn record-run [uuid config]
+(defn record-run [schema uuid config]
   (-write
-    (org.apache.hadoop.fs.Path. (.resolve -config-uri (str "uuid=" uuid "/data.parquet")))
+    schema
+    (.resolve -config-uri (str "uuid=" uuid "/data.parquet"))
     config))
 
-(defn record-generation [config-uuid index generation]
+(defn record-generation [schema config-uuid index generation]
   (-write
-    (org.apache.hadoop.fs.Path. (.resolve -generations-uri (str "uuid=" config-uuid "/" "index=" index "/data.parquet")))
+    schema
+    (.resolve -generations-uri (str "uuid=" config-uuid "/" "index=" index "/data.parquet"))
     generation))

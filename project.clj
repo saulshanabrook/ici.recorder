@@ -3,7 +3,7 @@
   :url "http://saulshanabrook.com/ici.recorder"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha15"]
                  [proto-repl "0.3.1"]
                  [clojure.java-time "0.2.2"]
                  [org.apache.parquet/parquet-hadoop "1.9.0"]
@@ -12,7 +12,7 @@
                  [org.alluxio/alluxio-core-client "1.4.0"]
                  [environ "1.1.0"]
                  [potemkin "0.4.3"]
-                 [proto-repl-sayid "0.1.3"]]
+                 [com.taoensso/timbre "4.8.0"]]
 
   :exclusions [org.slf4j/slf4j-log4j12]
   :managed-dependencies [[org.apache.hadoop/hadoop-common "2.2.0"]]
