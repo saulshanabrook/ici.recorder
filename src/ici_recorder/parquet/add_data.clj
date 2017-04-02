@@ -46,6 +46,10 @@
     org.apache.parquet.io.api.Binary/fromString
     (.addBinary record-consumer)))
 
+(defmethod add-not-nested [:string clojure.lang.Keyword]
+  [_ form ^org.apache.parquet.io.api.RecordConsumer record-consumer]
+  (add-not-nested :string (name form) record-consumer))
+
 (defmethod add-not-nested [:instant java.time.Instant]
   [_ form ^org.apache.parquet.io.api.RecordConsumer record-consumer]
   (add-not-nested :instant (long (.toEpochMilli form)) record-consumer))
