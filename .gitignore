@@ -16,3 +16,8 @@ parquet/*
 clojush/
 configs/
 generations/
+underfs
+storage
+logs
+journal
+data

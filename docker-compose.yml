@@ -19,7 +19,7 @@ services:
     ports:
       - "80:8888"
   alluxio:
-    build: alluxio
+    build: alluxio_
     volumes:
       # - ./storage:/tmp/storage
       - ./data/underfs:/tmp/underfs
