@@ -1,15 +1,28 @@
 version: '2'
 services:
-  apache-drill:
-    build: apache-drill
+  # jupyterhub:
+  #   build: jupyterhub
+  #   environment:
+  #     DOCKER_NOTEBOOK_IMAGE: "saulshanabrook/ici-recorder-jupyter-notebook"
+  #     DOCKER_NETWORK_NAME: "icirecorder_default"
+  #   volumes:
+  #     # Bind Docker socket on the host so we can connect to the daemon from
+  #     # within the container
+  #     - "/var/run/docker.sock:/var/run/docker.sock:rw"
+  #   ports:
+  #    - "443:443"
+  jupyter-notebook:
+    build: jupyter-notebook
+    volumes:
+      - ./data/notebooks:/home/jovyan/work
+    command: start-notebook.sh --NotebookApp.password='sha1:b689bdb78b77:c2e53af00e537fd286497049896c4487d69b6089'
     ports:
-     - "8047:8047"
-    tty: true
+      - "80:8888"
   alluxio:
     build: alluxio
     volumes:
       # - ./storage:/tmp/storage
-      - ./underfs:/tmp/underfs
+      - ./data/underfs:/tmp/underfs
       # - ./journal:/tmp/alluxio-1.4.0/journal/
       # - ./logs:/tmp/alluxio-1.4.0/logs
     ports:
