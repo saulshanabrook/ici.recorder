@@ -1,3 +1,0 @@
-[submodule "alluxio"]
-	path = clojure/alluxio
-	url = git://github.com/alluxio/alluxio.git
