@@ -1,7 +1,7 @@
 (ns ici-recorder.parquet.add-data
   (:require [clojure.spec :as s]
             [taoensso.timbre :as timbre]
-            
+
             [ici-recorder.parquet.schema.spec :as p])
 
   (:import (org.apache.parquet.schema)
@@ -12,8 +12,8 @@
            (org.apache.parquet.column)
            (java.lang.reflect)
            (org.apache.hadoop.fs)
-           (org.apache.parquet.io.api)
-           (java.time)))
+           (org.apache.parquet.io.api)))
+          ;  (java.time)))
 
 (defmulti add-not-nested
   (fn [not-nested form _]
@@ -50,9 +50,10 @@
   [_ form ^org.apache.parquet.io.api.RecordConsumer record-consumer]
   (add-not-nested :string (name form) record-consumer))
 
-(defmethod add-not-nested [:instant java.time.Instant]
-  [_ form ^org.apache.parquet.io.api.RecordConsumer record-consumer]
-  (add-not-nested :instant (long (.toEpochMilli form)) record-consumer))
+; including this requires a newer java version then in the docker image
+; (defmethod add-not-nested [:instant java.time.Instant]
+;   [_ form ^org.apache.parquet.io.api.RecordConsumer record-consumer]
+;   (add-not-nested :instant (long (.toEpochMilli form)) record-consumer))
 
 (defmethod add-not-nested [:instant java.lang.Long]
   [_ form ^org.apache.parquet.io.api.RecordConsumer record-consumer]
@@ -131,16 +132,16 @@
 
     (doseq [[k v] map_]
       (.startGroup record-consumer)
-      
+
       (.startField record-consumer "key" 0)
       (add-value key-type k record-consumer)
       (.endField record-consumer "key" 0)
-      
+
       (when (some? v)
         (.startField record-consumer "value" 1)
         (add-value value-type v record-consumer)
         (.endField record-consumer "value" 1))
-    
+
       (.endGroup record-consumer))
 
     (.endField record-consumer "key_value" 0)))

@@ -1,8 +1,6 @@
 (ns ici-recorder.parquet.schema.test-utils
   (:require [clojure.spec :as s]
-            [clojure.spec.gen :as gen]
-            [java-time]
-            [java-time.repl]))
+            [clojure.spec.gen :as gen]))
 
 (s/def ::duration
   int?)

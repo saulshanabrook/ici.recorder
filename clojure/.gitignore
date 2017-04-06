@@ -1,0 +1,10 @@
+# clojure
+target
+
+# created by tests
+config
+generation
+*.crc
+
+# created by errors
+*.log

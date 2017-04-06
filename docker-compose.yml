@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   # jupyterhub:
   #   build: jupyterhub
@@ -15,9 +15,12 @@ services:
     build: jupyter-notebook
     volumes:
       - ./data/notebooks:/home/jovyan/work
+      - ./jupyter-notebook/test:/tmp/test
     command: start-notebook.sh --NotebookApp.password='sha1:b689bdb78b77:c2e53af00e537fd286497049896c4487d69b6089'
     ports:
       - "80:8888"
+    environment:
+      CLOJUSH-PARQUET-URI: "alluxio://alluxio:19998/clojush/"
   alluxio:
     build: alluxio
     volumes:
@@ -29,3 +32,9 @@ services:
       - "19999:19999"
       - "30000:30000"
       - "19998:19998"
+  clojure:
+    build: clojure
+    volumes:
+      - ./clojure:/usr/src/app/
+    environment:
+      CLOJUSH-PARQUET-URI: "alluxio://alluxio:19998/clojush/"
