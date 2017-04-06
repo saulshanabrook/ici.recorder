@@ -4,7 +4,7 @@ RUN apk add --update bash && rm -rf /var/cache/apk/*
 
 WORKDIR /tmp/
 RUN wget http://alluxio.org/downloads/files/1.4.0/alluxio-1.4.0-bin.tar.gz
-RUN tar -xvzf alluxio-1.4.0-bin.tar.gz
+RUN tar -xzf alluxio-1.4.0-bin.tar.gz
 WORKDIR alluxio-1.4.0
 
 

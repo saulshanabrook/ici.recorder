@@ -1,5 +1,8 @@
 # `ici.recorder`
 
+[![Build Status](https://travis-ci.org/saulshanabrook/ici.recorder.svg?branch=master)](https://travis-ci.org/saulshanabrook/ici.recorder)
+
+
 For recording experiments at the [Institute for Computational Intelligence
 at Hampshire College](http://faculty.hampshire.edu/lspector/ici.html).
 
@@ -11,5 +14,5 @@ at Hampshire College](http://faculty.hampshire.edu/lspector/ici.html).
 ```bash
 docker-compose up -d alluxio
 docker-compose run --rm clojure
-docker-compose run --rm -w /tmp/test jupyter-notebook python -m unittest
+docker-compose run --rm jupyter-notebook-test
 ```

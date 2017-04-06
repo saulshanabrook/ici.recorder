@@ -1,0 +1,30 @@
+# based off of
+# https://github.com/vfarcic/docker-flow-cron/blob/1988f134fcc863b0832561121c1428f76f35db83/.travis.yml
+env:
+  DOCKER_COMPOSE_VERSION: 1.12.0
+
+services:
+  - docker
+
+# sudo: true
+before_install:
+  # need docker 1.13.0+ for compose file 3.0 which is required for pushing stacks
+  # https://gist.github.com/dylanscott/ea6cff4900c50f4e85a58c01477e9473
+  - sudo sh -c 'echo "deb https://apt.dockerproject.org/repo ubuntu-$(lsb_release -cs) main" > /etc/apt/sources.list.d/docker.list'
+  - curl -fsSL https://apt.dockerproject.org/gpg | sudo apt-key add -
+  - sudo apt-key fingerprint 58118E89F3A912897C070ADBF76221572C52609D
+  - sudo apt-get update
+  - sudo apt-get -y install "docker-engine=1.13.1-0~ubuntu-$(lsb_release -cs)"
+  # upgrade docker compose as well
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose-new
+  - chmod +x docker-compose-new
+
+before_script:
+  - ./docker-compose-new build alluxio
+  - ./docker-compose-new up -d alluxio
+  - ./docker-compose-new build clojure
+  - ./docker-compose-new build jupyter-notebook-test
+
+script:
+  - ./docker-compose-new run --rm clojure
+  - ./docker-compose-new run --rm jupyter-notebook-test
