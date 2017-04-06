@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha15"]
                 ;  [proto-repl "0.3.1"]
-                 [clojure.java-time "0.2.2"]
+                ;  [clojure.java-time "0.2.2"]
                  [org.apache.parquet/parquet-hadoop "1.9.0"]
                  [com.fzakaria/slf4j-timbre "0.3.4"]
                  [org.slf4j/log4j-over-slf4j "1.7.14"]
@@ -16,7 +16,7 @@
                  [org.clojure/test.check "0.9.0"]]
 
   :exclusions [org.slf4j/slf4j-log4j12]
-  :managed-dependencies [[org.apache.hadoop/hadoop-common "2.2.0"]]
+  :managed-dependencies [[org.apache.hadoop/hadoop-common "2.3.0"]]
   ; :jvm-opts ^:replace ["-Xmx32G"]
                       ;  "-XX:+UseConcMarkSweepGC"
                       ;  "-XX:+CMSClassUnloadingEnabled"
