@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 services:
   # jupyterhub:
   #   build: jupyterhub
@@ -15,33 +15,34 @@ services:
     build: jupyter-notebook
     image: icirecorder/jupyter-notebook:${TAG:-latest}
     volumes:
-      - ./data/notebooks:/home/jovyan/work
+      - notebooks:/home/jovyan/work
     command: start-notebook.sh --NotebookApp.password='sha1:b689bdb78b77:c2e53af00e537fd286497049896c4487d69b6089'
     ports:
-      - "80:8888"
-  jupyter-notebook-test:
-    build: jupyter-notebook
-    working_dir: /tmp/test
-    command: python -m unittest
-    volumes:
-      - ./jupyter-notebook/test:/tmp/test
-    environment:
-      CLOJUSH-PARQUET-URI: "alluxio://alluxio:19998/clojush/"
+      - target: 8888
+        published: 80
+        protocol: tcp
+        mode: host
   alluxio:
     build: alluxio
     image: icirecorder/alluxio:${TAG:-latest}
     volumes:
       # - ./storage:/tmp/storage
-      - ./data/underfs:/tmp/underfs
+      - alluxio:/tmp/underfs
       # - ./journal:/tmp/alluxio-1.4.0/journal/
       # - ./logs:/tmp/alluxio-1.4.0/logs
     ports:
-      - "19999:19999"
-      - "30000:30000"
-      - "19998:19998"
-  clojure:
-    build: clojure
-    volumes:
-      - ./clojure:/usr/src/app/
-    environment:
-      CLOJUSH-PARQUET-URI: "alluxio://alluxio:19998/clojush/"
+      - target: 19998
+        published: 19998
+        protocol: tcp
+        mode: host
+      - target: 19999
+        published: 19999
+        protocol: tcp
+        mode: host
+      - target: 30000
+        published: 30000
+        protocol: tcp
+        mode: host
+volumes:
+  notebooks:
+  alluxio:

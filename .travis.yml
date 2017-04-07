@@ -6,8 +6,6 @@ env:
 
 services:
   - docker
-
-# sudo: true
 before_install:
   # need docker 1.13.0+ for compose file 3.0 which is required for pushing stacks
   # https://gist.github.com/dylanscott/ea6cff4900c50f4e85a58c01477e9473
@@ -34,3 +32,8 @@ script:
 after_success:
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
   - ./docker-compose-new push
+  - TAG=latest ./docker-compose-new push
+  - openssl aes-256-cbc -K $encrypted_a3016063d1da_key -iv $encrypted_a3016063d1da_iv -in key.enc -out key -d
+  - chmod 600 key
+  - "scp -i key  -o StrictHostKeyChecking=no docker-compose.yml $SWARM_MANAGER:"
+  - ssh -i key -o StrictHostKeyChecking=no $SWARM_MANAGER sudo TAG=${TAG} docker stack deploy -c docker-compose.yml ici-recorder

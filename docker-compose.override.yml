@@ -1,0 +1,20 @@
+version: '3.2'
+services:
+  jupyter-notebook-test:
+    build: jupyter-notebook
+    working_dir: /tmp/test
+    command: python -m unittest
+    volumes:
+      - ./jupyter-notebook/test:/tmp/test
+    environment:
+      CLOJUSH-PARQUET-URI: "alluxio://alluxio:19998/clojush/"
+    deploy:
+      mode: global
+  clojure:
+    build: clojure
+    volumes:
+      - ./clojure:/usr/src/app/
+    environment:
+      CLOJUSH-PARQUET-URI: "alluxio://alluxio:19998/clojush/"
+    deploy:
+      mode: global
