@@ -2,6 +2,7 @@
 # https://github.com/vfarcic/docker-flow-cron/blob/1988f134fcc863b0832561121c1428f76f35db83/.travis.yml
 env:
   DOCKER_COMPOSE_VERSION: 1.12.0
+  TAG: 0.${TRAVIS_BUILD_NUMBER}
 
 services:
   - docker
@@ -24,7 +25,12 @@ before_script:
   - ./docker-compose-new up -d alluxio
   - ./docker-compose-new build clojure
   - ./docker-compose-new build jupyter-notebook-test
+  - ./docker-compose-new build jupyter-notebook
 
 script:
   - ./docker-compose-new run --rm clojure
   - ./docker-compose-new run --rm jupyter-notebook-test
+
+after_success:
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  - ./docker-compose-new push
