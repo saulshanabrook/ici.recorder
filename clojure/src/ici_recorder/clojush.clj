@@ -14,13 +14,7 @@
      :compression-codec "GZIP"
      :hadoop {"fs.alluxio.impl" "alluxio.hadoop.FileSystem"
               "fs.alluxio-ft.impl" "alluxio.hadoop.FaultTolerantFileSystem"
-              "fs.AbstractFileSystem.alluxio.impl" "alluxio.hadoop.AlluxioFileSystem"
-              "alluxio.security.group.mapping.class" "alluxio.security.group.provider.IdentityUserGroupsMapping"
-              "alluxio.user.file.writetype.default" "ASYNC_THROUGH"
-              "alluxio.security.authorization.permission.umask" "000"}}))
-              ; "alluxio.security.login.username" "root"
-              ; "alluxio.security.authorization.permission.enabled" "false"}}))
-              ; "alluxio.security.authentication.type" "NOSASL"}}))
+              "fs.AbstractFileSystem.alluxio.impl" "alluxio.hadoop.AlluxioFileSystem"}}))
 
 (def -uri (java.net.URI. (environ.core/env :clojush-parquet-uri "")))
 (def -config-uri (.resolve -uri "configs/"))

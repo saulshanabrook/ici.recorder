@@ -8,3 +8,6 @@ generation
 
 # created by errors
 *.log
+
+alluxio-site.properties
+.lein-failures

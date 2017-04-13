@@ -15,20 +15,14 @@
 # must switch to JDK 8 in order to apk install maven
 FROM openjdk:8-jdk-alpine
 
-ARG ALLUXIO_REF=master
+RUN apk add --update bash && \
+    rm -rf /var/cache/apk/*
 
-# download and build alluxio
-RUN   apk add --update ca-certificates wget maven bash \
-  &&  update-ca-certificates \
-  &&  rm -rf /var/cache/apk/*
 
-RUN wget https://github.com/Alluxio/alluxio/archive/${ALLUXIO_REF}.zip
-RUN unzip ${ALLUXIO_REF}.zip
+COPY alluxio-out /alluxio
+WORKDIR /alluxio
 
-# this part modified from aluxio/dev/scripts/generate-tarball.sh
-WORKDIR alluxio-${ALLUXIO_REF}
-RUN mvn -T 4C install package -Dspark -Dhadoop.version=2.3.0 \
--Dmaven.javadoc.skip=true -DskipTests -Dlicense.skip=true \
--Dcheckstyle.skip=true -Dfindbugs.skip=true
-RUN tar --exclude .git --exclude logs --exclude dev -czf /tmp/alluxio.tgz .
-CMD ["cat", "/tmp/alluxio.tgz"]
+COPY entrypoint.sh /
+ENTRYPOINT ["/entrypoint.sh"]
+
+COPY alluxio-site.properties conf/

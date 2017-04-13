@@ -19,15 +19,27 @@ before_install:
   - chmod +x docker-compose-new
 
 before_script:
-  - ./docker-compose-new build alluxio
-  - ./docker-compose-new up -d alluxio
-  - ./docker-compose-new build clojure
-  - ./docker-compose-new build jupyter-notebook-test
-  - ./docker-compose-new build jupyter-notebook
+  - ./docker-compose-new build build-alluxio
+  - mkdir alluxio-out
+  - ./docker-compose-new run --rm -T build-alluxio | tar -zxC alluxio-out -f -
 
+
+  - cp alluxio-out/core/client/target/alluxio-core-client-1.5.0-SNAPSHOT-jar-with-dependencies.jar jupyter-notebook/alluxio.jar
+  - cp alluxio-out/core/client/target/alluxio-core-client-1.5.0-SNAPSHOT-jar-with-dependencies.jar clojure/alluxio.jar
+  - cp -r alluxio-out/ alluxio-server/alluxio-out
+
+  - cp alluxio/alluxio-site.properties alluxio-server/
+  - cp alluxio/alluxio-site.properties clojure/
+  - cp alluxio/alluxio-site.properties jupyter-notebook/
+
+  - ./docker-compose-new build alluxio-worker alluxio-master test-alluxio
+  - ./docker-compose-new up -d alluxio-worker alluxio-master
+  - ./docker-compose-new build jupyter-notebook test-jupyter-notebook
+  - ./docker-compose-new build test-clojure
 script:
-  - ./docker-compose-new run --rm clojure
-  - ./docker-compose-new run --rm jupyter-notebook-test
+  - ./docker-compose-new run --rm test-alluxio
+  - ./docker-compose-new run --rm test-clojure
+  - ./docker-compose-new run --rm test-jupyter-notebook
 
 after_success:
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
@@ -35,5 +47,5 @@ after_success:
   - TAG=latest ./docker-compose-new push
   - openssl aes-256-cbc -K $encrypted_a3016063d1da_key -iv $encrypted_a3016063d1da_iv -in key.enc -out key -d
   - chmod 600 key
-  - "scp -i key  -o StrictHostKeyChecking=no docker-compose.yml $SWARM_MANAGER:"
-  - ssh -i key -o StrictHostKeyChecking=no $SWARM_MANAGER sudo TAG=${TAG} docker stack deploy -c docker-compose.yml ici-recorder
+  - "scp -i key  -o StrictHostKeyChecking=no docker-compose.yml $SERVER_USERNAME@$EXTERNAL_DOCKER_HOST"
+  - ssh -i key -o StrictHostKeyChecking=no $SERVER_USERNAME@$EXTERNAL_DOCKER_HOST sudo TAG=${TAG} SERVER_HOST=${EXTERNAL_DOCKER_HOST} docker stack deploy -c docker-compose.yml ici-recorder

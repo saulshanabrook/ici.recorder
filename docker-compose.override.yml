@@ -1,20 +1,25 @@
 version: '3.2'
 services:
-  jupyter-notebook-test:
+  test-alluxio:
+    build: alluxio-server
+    entrypoint: bin/alluxio
+    command: runTests
+    environment:
+      ALLUXIO_MASTER_HOSTNAME: ${SERVER_HOST:-alluxio-master}
+
+  test-jupyter-notebook:
     build: jupyter-notebook
     working_dir: /tmp/test
     command: python -m unittest
     volumes:
       - ./jupyter-notebook/test:/tmp/test
     environment:
-      CLOJUSH-PARQUET-URI: "alluxio://alluxio:19998/clojush/"
-    deploy:
-      mode: global
-  clojure:
+      CLOJUSH-PARQUET-URI: "alluxio://alluxio-master:19998/clojush/"
+  test-clojure:
     build: clojure
     volumes:
       - ./clojure:/usr/src/app/
     environment:
-      CLOJUSH-PARQUET-URI: "alluxio://alluxio:19998/clojush/"
-    deploy:
-      mode: global
+      CLOJUSH-PARQUET-URI: "alluxio://alluxio-master:19998/clojush/"
+  build-alluxio:
+    build: alluxio

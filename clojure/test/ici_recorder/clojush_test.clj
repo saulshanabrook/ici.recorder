@@ -1,6 +1,6 @@
 (ns ici-recorder.clojush-test
   (:require [ici-recorder.clojush :refer [record-run]]
-            
+
             [clojure.test :as t]))
 
 

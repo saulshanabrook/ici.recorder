@@ -9,7 +9,7 @@
                  [org.apache.parquet/parquet-hadoop "1.9.0"]
                  [com.fzakaria/slf4j-timbre "0.3.4"]
                  [org.slf4j/log4j-over-slf4j "1.7.14"]
-                 [org.alluxio/alluxio-core-client "1.4.0"]
+                ;  [org.alluxio/alluxio-core-client "1.4.0"]
                  [environ "1.1.0"]
                  [potemkin "0.4.3"]
                  [com.taoensso/timbre "4.8.0"]
@@ -17,6 +17,8 @@
 
   :exclusions [org.slf4j/slf4j-log4j12]
   :managed-dependencies [[org.apache.hadoop/hadoop-common "2.3.0"]]
+  :resource-paths ["alluxio.jar"
+                   "alluxio-site.properties"]
   ; :jvm-opts ^:replace ["-Xmx32G"]
                       ;  "-XX:+UseConcMarkSweepGC"
                       ;  "-XX:+CMSClassUnloadingEnabled"

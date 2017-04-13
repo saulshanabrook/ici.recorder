@@ -21,28 +21,56 @@ services:
       - target: 8888
         published: 80
         protocol: tcp
-        mode: host
-  alluxio:
-    build: alluxio
-    image: icirecorder/alluxio:${TAG:-latest}
+        mode: ingress
+  alluxio-master:
+    build:
+      context: alluxio-server
+      # args:
+        # use newer version to get https://github.com/Alluxio/alluxio/pull/4771/files
+        # - REF=fae727c2236d0c5dfe53c04006dd70509cb38b94
+    # image: icirecorder/alluxio:${TAG:-latest}
+    command: [master]
+    environment:
+      ALLUXIO_MASTER_HOSTNAME: ${SERVER_HOST:-alluxio-master}
+      ALLUXIO_WORKER_HOSTNAME: ${SERVER_HOST:-alluxio-worker}
     volumes:
-      # - ./storage:/tmp/storage
-      - alluxio:/tmp/underfs
-      # - ./journal:/tmp/alluxio-1.4.0/journal/
-      # - ./logs:/tmp/alluxio-1.4.0/logs
+      - alluxio:/under
+    expose:
+      - 19998
+      - 19999
     ports:
-      - target: 19998
-        published: 19998
-        protocol: tcp
-        mode: host
-      - target: 19999
-        published: 19999
-        protocol: tcp
-        mode: host
-      - target: 30000
-        published: 30000
-        protocol: tcp
-        mode: host
+      - "19998:19998"
+      - "19999:19999"
+      # - target: 19998
+      #   published: 19998
+      #   protocol: tcp
+      #   mode: ingress
+      # - target: 19999
+      #   published: 19999
+      #   protocol: tcp
+      #   mode: ingress
+  alluxio-worker:
+    build:
+      context: alluxio-server
+      # args:
+        # use newer version to get https://github.com/Alluxio/alluxio/pull/4771/files
+        # - REF=fae727c2236d0c5dfe53c04006dd70509cb38b94
+    # image: icirecorder/alluxio:${TAG:-latest}
+    command: [worker]
+    environment:
+      ALLUXIO_MASTER_HOSTNAME: ${SERVER_HOST:-alluxio-master}
+      ALLUXIO_WORKER_HOSTNAME: ${SERVER_HOST:-alluxio-worker}
+    volumes:
+      - alluxio:/under
+    expose:
+      - 29998
+      - 29999
+      - 30000
+    ports:
+      - "29998:29998"
+      - "29999:29999"
+      - "30000:30000"
+    # hostname: ${HOST:-0.0.0.0}
 volumes:
   notebooks:
   alluxio:
