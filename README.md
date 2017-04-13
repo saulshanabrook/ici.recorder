@@ -31,7 +31,7 @@ Until then we have to:
 
 ```bash
 docker-compose build build-alluxio
-mkdir alluxio-out
+mkdir -p alluxio-out
 docker-compose run --rm -T build-alluxio | tar -zxC alluxio-out -f -
 
 cp alluxio-out/core/client/target/alluxio-core-client-1.5.0-SNAPSHOT-jar-with-dependencies.jar jupyter-notebook/alluxio.jar
