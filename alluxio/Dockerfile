@@ -22,12 +22,12 @@ RUN   apk add --update ca-certificates wget maven bash \
   &&  update-ca-certificates \
   &&  rm -rf /var/cache/apk/*
 
-RUN wget https://github.com/Alluxio/alluxio/archive/${ALLUXIO_REF}.zip
-RUN unzip ${ALLUXIO_REF}.zip
+ADD https://github.com/Alluxio/alluxio/archive/${ALLUXIO_REF}.zip alluxio.zip
+RUN unzip -qq alluxio.zip
 
 # this part modified from aluxio/dev/scripts/generate-tarball.sh
 WORKDIR alluxio-${ALLUXIO_REF}
-RUN mvn -T 4C install package -Dspark -Dhadoop.version=2.3.0 \
+RUN mvn -q --batch-mode -T 4C install package -Dspark -Dhadoop.version=2.3.0 \
 -Dmaven.javadoc.skip=true -DskipTests -Dlicense.skip=true \
 -Dcheckstyle.skip=true -Dfindbugs.skip=true
 RUN tar --exclude .git --exclude logs --exclude dev -czf /tmp/alluxio.tgz .
