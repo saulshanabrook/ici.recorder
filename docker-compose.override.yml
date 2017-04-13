@@ -22,4 +22,7 @@ services:
     environment:
       CLOJUSH-PARQUET-URI: "alluxio://alluxio-master:19998/clojush/"
   build-alluxio:
-    build: alluxio
+    build:
+      context: alluxio
+      args:
+        ALLUXIO_REF: addadd2a4d58814e2aacc785df457fd4d6e35f31
