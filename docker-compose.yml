@@ -26,10 +26,6 @@ services:
     image: icirecorder/alluxio:${TAG:-latest}
     build:
       context: alluxio-server
-      # args:
-        # use newer version to get https://github.com/Alluxio/alluxio/pull/4771/files
-        # - REF=fae727c2236d0c5dfe53c04006dd70509cb38b94
-    # image: icirecorder/alluxio:${TAG:-latest}
     command: [master]
     environment:
       ALLUXIO_MASTER_HOSTNAME: ${SERVER_HOST:-alluxio-master}
@@ -42,22 +38,11 @@ services:
     ports:
       - "19998:19998"
       - "19999:19999"
-      # - target: 19998
-      #   published: 19998
-      #   protocol: tcp
-      #   mode: ingress
-      # - target: 19999
-      #   published: 19999
-      #   protocol: tcp
-      #   mode: ingress
+
   alluxio-worker:
     image: icirecorder/alluxio:${TAG:-latest}
     build:
       context: alluxio-server
-      # args:
-        # use newer version to get https://github.com/Alluxio/alluxio/pull/4771/files
-        # - REF=fae727c2236d0c5dfe53c04006dd70509cb38b94
-    # image: icirecorder/alluxio:${TAG:-latest}
     command: [worker]
     environment:
       ALLUXIO_MASTER_HOSTNAME: ${SERVER_HOST:-alluxio-master}
@@ -72,7 +57,15 @@ services:
       - "29998:29998"
       - "29999:29999"
       - "30000:30000"
-    # hostname: ${HOST:-0.0.0.0}
+  cadvisor:
+    image: google/cadvisor:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
 volumes:
   notebooks:
   alluxio:
