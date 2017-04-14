@@ -23,6 +23,7 @@ services:
         protocol: tcp
         mode: ingress
   alluxio-master:
+    image: icirecorder/alluxio:${TAG:-latest}
     build:
       context: alluxio-server
       # args:
@@ -50,6 +51,7 @@ services:
       #   protocol: tcp
       #   mode: ingress
   alluxio-worker:
+    image: icirecorder/alluxio:${TAG:-latest}
     build:
       context: alluxio-server
       # args:
