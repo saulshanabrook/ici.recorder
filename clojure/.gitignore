@@ -12,3 +12,6 @@ generation
 alluxio-site.properties
 .lein-failures
 myrepo
+clojush/
+generations/
+tmp/

@@ -1,6 +1,6 @@
 (ns ici-recorder.parquet.write-test
   (:require [ici-recorder.parquet.write :refer [write ->hadoop-config]]
-            [ici-recorder.parquet.schema.test-utils :as test-utils]
+            [ici-recorder.test-utils :as test-utils]
 
             [clojure.test :as t]
             [clojure.spec.gen :as gen]

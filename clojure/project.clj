@@ -3,12 +3,13 @@
   :url "http://saulshanabrook.com/ici.recorder"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :main "ici-recorder.clojush-benchmark"
   :dependencies [[org.clojure/clojure "1.9.0-alpha15"]
                 ;  [proto-repl "0.3.1"]
                 ;  [clojure.java-time "0.2.2"]
                  [org.apache.parquet/parquet-hadoop "1.9.0"]
-                 [com.fzakaria/slf4j-timbre "0.3.4"]
-                 [org.slf4j/log4j-over-slf4j "1.7.14"]
+                ;  [com.fzakaria/slf4j-timbre "0.3.4"]
+                ;  [org.slf4j/log4j-over-slf4j "1.7.14"]
                  [org.alluxio/alluxio-core-client "dev"]
                  [environ "1.1.0"]
                  [potemkin "0.4.3"]
@@ -18,7 +19,7 @@
   :exclusions [org.slf4j/slf4j-log4j12]
   :managed-dependencies [; use the same version of this accross parquet and alluxio
                          [org.apache.hadoop/hadoop-common "2.2.0"]
-                         ; force upgrade this to deal with 
+                         ; force upgrade this to deal with
                          ; https://github.com/ptaoussanis/carmine/issues/5
                          [org.xerial.snappy/snappy-java "1.1.4-M3"]]
   :repositories [["localrepo1"  {:url "file:myrepo"
@@ -27,10 +28,10 @@
                                  :password :env/localrepo_password}]]
 
   :resource-paths ["alluxio-site.properties"]
-  ; :jvm-opts ^:replace ["-Xmx32G"]
-                      ;  "-XX:+UseConcMarkSweepGC"
-                      ;  "-XX:+CMSClassUnloadingEnabled"
-                      ;  "-Xverify:none"])
+  :jvm-opts ^:replace ["-Xmx32G"
+                       "-XX:+UseConcMarkSweepGC"
+                       "-XX:+CMSClassUnloadingEnabled"
+                       "-Xverify:none"]
                       ;  "-agentpath:/Users/saul/Downloads/YourKit-Java-Profiler-2017.02.app/Contents/Resources/bin/mac/libyjpagent.jnilib"]
 
   :aot :all
@@ -42,4 +43,5 @@
                   ["deploy"]
                   ["change" "version" "leiningen.release/bump-version" "qualifier"]
                   ["shell" "git" "commit" "-am" "Version ${:version} [ci skip]"]
-                  ["vcs" "push"]])
+                  ["vcs" "push"]]
+  :global-vars {*warn-on-reflection* true})

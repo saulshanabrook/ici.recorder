@@ -2,7 +2,9 @@
   (:require [clojure.spec :as s]
             [ici-recorder.parquet.add-data :refer [add-record]]
             [ici-recorder.parquet.schema.interop :refer [->schema]]
-            [ici-recorder.parquet.schema.spec :as p])
+            [ici-recorder.parquet.schema.spec :as p]
+            [taoensso.timbre.profiling :as profiling :refer [defnp p] :rename {p pp}])
+
   (:import (org.apache.parquet.schema)
            (clojure.lang)
            (org.apache.parquet.hadoop.api)
@@ -72,7 +74,7 @@
 (s/def ::options
   (s/keys :req-un [::path ::write-mode ::validation ::hadoop-config ::compression-codec]))
 
-(defn ->parquet-writer ^org.apache.parquet.hadoop.ParquetWriter [schema options]
+(defnp ->parquet-writer ^org.apache.parquet.hadoop.ParquetWriter [schema options]
   (-> (->builder schema (:path options))
     (.withWriteMode
       (Enum/valueOf org.apache.parquet.hadoop.ParquetFileWriter$Mode (:write-mode options)))
@@ -91,7 +93,8 @@
   [schema form options]
   (let [^org.apache.parquet.hadoop.ParquetWriter parquet-writer (->parquet-writer schema options)]
     (.write parquet-writer form)
-    (.close parquet-writer)))
+    (pp :close
+      (.close parquet-writer))))
 
 (s/fdef write
   :args (s/cat :schema ::p/schema :form any? :options ::options))

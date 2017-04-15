@@ -1,4 +1,4 @@
-(ns ici-recorder.parquet.schema.test-utils
+(ns ici-recorder.test-utils
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]))
 
@@ -33,7 +33,7 @@
 
 (s/def ::error double?)
 (def p-error :double)
-(s/def ::errors (s/coll-of ::error :count 10)) ; 20))
+(s/def ::errors (s/coll-of ::error :count 20))
 (def p-errors [true p-error])
 (s/def ::uuid string?)
 (def p-uuid :string)
@@ -50,7 +50,7 @@
 (def p-parent-uuid p-uuid)
 (s/def ::ancestors ::errors)
 (def p-ancestors p-errors)
-(s/def ::program (s/coll-of ::instruction  :count 20)) ; 200))
+(s/def ::program (s/coll-of ::instruction  :count 200))
 (def p-program [true p-instruction])
 (s/def ::total-error ::error)
 (def p-total-error p-error)
@@ -75,7 +75,7 @@
    :silent [false p-silent]
    :random-closes [false p-random-closes]
    :parent-uuid [false p-parent-uuid]})
-(s/def ::plush-genome (s/coll-of ::plush-instruction-map :count 20)) ;:count 200))
+(s/def ::plush-genome (s/coll-of ::plush-instruction-map :count 200))
 (def p-plush-genome [true p-plush-instruction-map])
 
 (s/def ::individual (s/keys :req-un [::plush-genome ::program]

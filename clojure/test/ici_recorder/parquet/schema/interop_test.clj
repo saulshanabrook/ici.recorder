@@ -1,6 +1,6 @@
 (ns ici-recorder.parquet.schema.interop-test
   (:require [ici-recorder.parquet.schema.interop :refer [->schema]]
-            [ici-recorder.parquet.schema.test-utils :as test-utils]
+            [ici-recorder.test-utils :as test-utils]
             [clojure.test :as t]))
 
 
