@@ -1,11 +1,11 @@
 (ns ici-recorder.parquet.write-test
-  (:require [ici-recorder.parquet.write :refer [write]]
+  (:require [ici-recorder.parquet.write :refer [write ->hadoop-config]]
             [ici-recorder.parquet.schema.test-utils :as test-utils]
-            
+
             [clojure.test :as t]
             [clojure.spec.gen :as gen]
             [clojure.spec.test :as stest]))
-          
+
 (-> 'ici-recorder.parquet.add-data
   stest/enumerate-namespace
   stest/instrument)
@@ -20,7 +20,7 @@
    :write-mode "OVERWRITE"
    :validation true
    :compression-codec "SNAPPY"
-   :hadoop {}})
+   :hadoop-config (->hadoop-config {})})
 
 (t/deftest test-write
   (t/testing "configuration"

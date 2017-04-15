@@ -16,8 +16,13 @@
                  [org.clojure/test.check "0.9.0"]]
 
   :exclusions [org.slf4j/slf4j-log4j12]
-  :managed-dependencies [[org.apache.hadoop/hadoop-common "2.2.0"]]
+  :managed-dependencies [; use the same version of this accross parquet and alluxio
+                         [org.apache.hadoop/hadoop-common "2.2.0"]
+                         ; force upgrade this to deal with 
+                         ; https://github.com/ptaoussanis/carmine/issues/5
+                         [org.xerial.snappy/snappy-java "1.1.4-M3"]]
   :repositories [["localrepo1"  {:url "file:myrepo"
+                                 ;; provide these so doesn't iteractivly ask for config
                                  :username :env/localrepo_username
                                  :password :env/localrepo_password}]]
 

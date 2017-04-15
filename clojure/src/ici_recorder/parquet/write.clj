@@ -1,5 +1,5 @@
 (ns ici-recorder.parquet.write
-  (:require [clojure.spec :as s]            
+  (:require [clojure.spec :as s]
             [ici-recorder.parquet.add-data :refer [add-record]]
             [ici-recorder.parquet.schema.interop :refer [->schema]]
             [ici-recorder.parquet.schema.spec :as p])
@@ -56,32 +56,32 @@
 
 
 (s/def ::hadoop (s/map-of string? string?))
-(defn ->configuration [hadoop]
+(defn ->hadoop-config [hadoop]
   (let [conf (org.apache.hadoop.conf.Configuration.)]
     (doseq [[k v] hadoop]
       (.set conf k v))
     conf))
 
-(s/fdef ->configuration
+(s/fdef ->hadoop-config
   :args (s/cat :hadoop ::hadoop))
 
 (s/def ::write-mode (enum->values (org.apache.parquet.hadoop.ParquetFileWriter$Mode/values)))
 (s/def ::validation boolean?)
 (s/def ::compression-codec (enum->values (org.apache.parquet.hadoop.metadata.CompressionCodecName/values)))
+(s/def ::hadoop-config (partial instance? org.apache.hadoop.conf.Configuration))
 (s/def ::options
-  (s/keys :req-un [::path ::write-mode ::validation ::hadoop ::compression-codec]))
+  (s/keys :req-un [::path ::write-mode ::validation ::hadoop-config ::compression-codec]))
 
 (defn ->parquet-writer ^org.apache.parquet.hadoop.ParquetWriter [schema options]
   (-> (->builder schema (:path options))
     (.withWriteMode
       (Enum/valueOf org.apache.parquet.hadoop.ParquetFileWriter$Mode (:write-mode options)))
     (.withValidation (:validation options))
-    (.withConf (->configuration (:hadoop options)))
+    (.withConf (:hadoop-config options))
     (.withCompressionCodec
       (Enum/valueOf org.apache.parquet.hadoop.metadata.CompressionCodecName (:compression-codec options)))
     ; (.withWriterVersion org.apache.parquet.column.ParquetProperties$WriterVersion/PARQUET_2_0)
     .build))
-
 
 (s/fdef ->parquet-writer
   :args (s/cat :schema ::p/schema :options ::options))
