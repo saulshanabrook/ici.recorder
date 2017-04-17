@@ -25,7 +25,7 @@
       {:path tmp-uri
        :write-mode "OVERWRITE"
        :validation true
-       :compression-codec "GZIP"
+       :compression-codec "SNAPPY"
        :hadoop-config -hadoop-config})
 
     (.rename -fs tmp-uri uri)
