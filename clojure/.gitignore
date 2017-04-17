@@ -18,3 +18,5 @@ tmp/
 .nrepl-port
 configs/
 generations/
+*.iml
+.idea/
