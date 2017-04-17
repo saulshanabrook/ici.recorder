@@ -4,6 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :main "ici-recorder.clojush-benchmark"
+  ; :main "ici-recorder.parquet.add-data"
   :dependencies [[org.clojure/clojure "1.9.0-alpha15"]
                 ;  [proto-repl "0.3.1"]
                 ;  [clojure.java-time "0.2.2"]
@@ -13,8 +14,10 @@
                  [org.alluxio/alluxio-core-client "dev"]
                  [environ "1.1.0"]
                  [potemkin "0.4.3"]
-                 [com.taoensso/timbre "4.8.0"]
-                 [org.clojure/test.check "0.9.0"]]
+                 [proto-repl "0.3.1"]
+                 [com.taoensso/timbre "4.10.0"]
+                 [org.clojure/test.check "0.9.0"]
+                 [criterium "0.4.4"]]
 
   :exclusions [org.slf4j/slf4j-log4j12]
   :managed-dependencies [; use the same version of this accross parquet and alluxio
@@ -28,7 +31,7 @@
                                  :password :env/localrepo_password}]]
 
   :resource-paths ["alluxio-site.properties"]
-  :jvm-opts ^:replace ["-Xmx32G"
+  :jvm-opts ^:replace [;"-Xmx32G"
                        "-XX:+UseConcMarkSweepGC"
                        "-XX:+CMSClassUnloadingEnabled"
                        "-Xverify:none"]

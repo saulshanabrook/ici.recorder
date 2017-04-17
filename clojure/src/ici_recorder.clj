@@ -1,10 +1,11 @@
 (ns ici-recorder
   (:require [potemkin]
-            [taoensso.timbre]
-            [ici-recorder.clojush]))
+            [ici-recorder.clojush]
+            [ici-recorder.parquet.write-support]))
 
-(taoensso.timbre/set-level! :error)
 (potemkin/import-vars
   [ici-recorder.clojush
     record-run
-    record-generation])
+    record-generation]
+  [ici-recorder.parquet.write-support
+    ->write-support])

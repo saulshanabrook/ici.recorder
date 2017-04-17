@@ -1,10 +1,7 @@
 (ns ici-recorder.parquet.write
   (:require [clojure.spec :as s]
-            [ici-recorder.parquet.add-data :refer [add-record]]
-            [ici-recorder.parquet.schema.interop :refer [->schema]]
             [ici-recorder.parquet.schema.spec :as p]
-            [taoensso.timbre.profiling :as profiling :refer [defnp p] :rename {p pp}])
-
+            [ici-recorder.parquet.spec :as hadoop-s])
   (:import (org.apache.parquet.schema)
            (clojure.lang)
            (org.apache.parquet.hadoop.api)
@@ -21,40 +18,14 @@
     (map #(.name %))
     set))
 
-(defn ->write-context [schema]
-  (org.apache.parquet.hadoop.api.WriteSupport$WriteContext. (->schema schema) {}))
-
-(s/fdef ->write-context
-  :args (s/cat :schema ::p/schema))
-
-
-(defn ->write-support [schema]
-  (let [record-consumer (atom nil)]
-    (proxy [org.apache.parquet.hadoop.api.WriteSupport] []
-
-      (init [configuration]
-        (->write-context schema))
-
-      (prepareForWrite [record-consumer_]
-        (compare-and-set! record-consumer nil record-consumer_))
-
-      (write [record]
-        (add-record schema record @record-consumer)))))
-
-(s/fdef ->write-support
-  :args (s/cat :schema ::p/schema))
-
-
-(s/def ::path (partial instance? org.apache.hadoop.fs.Path))
-
-(defn ->builder ^org.apache.parquet.hadoop.ParquetWriter$Builder [schema path]
+(defn ->builder ^org.apache.parquet.hadoop.ParquetWriter$Builder [write-support path]
   (proxy [org.apache.parquet.hadoop.ParquetWriter$Builder] [path]
     (getWriteSupport [configuration]
-      (->write-support schema))
+      write-support)
     (self []
        this)))
 (s/fdef ->parquet-writer
-  :args (s/cat :schema ::p/schema :path ::path))
+  :args (s/cat :write-support ::hadoop-s/write-support :path ::path))
 
 
 (s/def ::hadoop (s/map-of string? string?))
@@ -72,10 +43,10 @@
 (s/def ::compression-codec (enum->values (org.apache.parquet.hadoop.metadata.CompressionCodecName/values)))
 (s/def ::hadoop-config (partial instance? org.apache.hadoop.conf.Configuration))
 (s/def ::options
-  (s/keys :req-un [::path ::write-mode ::validation ::hadoop-config ::compression-codec]))
+  (s/keys :req-un [::hadoop-s/path ::write-mode ::validation ::hadoop-config ::compression-codec]))
 
-(defnp ->parquet-writer ^org.apache.parquet.hadoop.ParquetWriter [schema options]
-  (-> (->builder schema (:path options))
+(defn ->parquet-writer ^org.apache.parquet.hadoop.ParquetWriter [write-support options]
+  (-> (->builder write-support (:path options))
     (.withWriteMode
       (Enum/valueOf org.apache.parquet.hadoop.ParquetFileWriter$Mode (:write-mode options)))
     (.withValidation (:validation options))
@@ -86,15 +57,14 @@
     .build))
 
 (s/fdef ->parquet-writer
-  :args (s/cat :schema ::p/schema :options ::options))
+  :args (s/cat :write-support ::hadoop-s/write-support :options ::options))
 
 
 (defn write
-  [schema form options]
-  (let [^org.apache.parquet.hadoop.ParquetWriter parquet-writer (->parquet-writer schema options)]
+  [write-support form options]
+  (let [^org.apache.parquet.hadoop.ParquetWriter parquet-writer (->parquet-writer write-support options)]
     (.write parquet-writer form)
-    (pp :close
-      (.close parquet-writer))))
+    (.close parquet-writer)))
 
 (s/fdef write
-  :args (s/cat :schema ::p/schema :form any? :options ::options))
+  :args (s/cat :write-support ::hadoop-s/write-support :form any? :options ::options))

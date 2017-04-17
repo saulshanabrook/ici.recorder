@@ -1,7 +1,8 @@
 (ns ici-recorder.test-utils
   (:require [clojure.spec :as s]
-            [clojure.spec.gen :as gen]))
+            [clojure.spec.gen :as gen]
 
+            [ici-recorder.parquet.write-support :refer [->write-support]]))
 (s/def ::duration
   int?)
   ; (s/with-gen
@@ -25,11 +26,12 @@
 (s/def ::configuration (s/keys :req-un [::problem-file ::parameters ::clojush-version ::initialization-time]
                                :opt-un [::git-commit]))
 (def p-configuration
-  {:problem-file [true p-problem-file]
+  (array-map
+   :problem-file [true p-problem-file]
    :parameters [true p-parameters]
    :clojush-version [true p-clojush-version]
    :initialization-time [true p-initialization-time]
-   :git-commit [false p-git-commit]})
+   :git-commit [false p-git-commit]))
 
 (s/def ::error double?)
 (def p-error :double)
@@ -69,19 +71,21 @@
 (s/def ::plush-instruction-map (s/keys :req-un [::instruction]
                                        :opt-un [::uuid ::random-insertion ::silent ::random-closes ::parent-uuid]))
 (def p-plush-instruction-map
-  {:instruction [true p-instruction]
+  (array-map
+   :instruction [true p-instruction]
    :uuid [false p-uuid]
    :random-insertion [false p-random-insertion]
    :silent [false p-silent]
    :random-closes [false p-random-closes]
-   :parent-uuid [false p-parent-uuid]})
+   :parent-uuid [false p-parent-uuid]))
 (s/def ::plush-genome (s/coll-of ::plush-instruction-map :count 200))
 (def p-plush-genome [true p-plush-instruction-map])
 
 (s/def ::individual (s/keys :req-un [::plush-genome ::program]
                             :opt-un [::errors ::total-error ::normalized-error ::meta-errors ::history ::ancestors ::uuid ::parent-uuids ::genetic-operators ::is-random-replacement]))
 (def p-individual
-  {:plush-genome [true p-plush-genome]
+  (array-map
+   :plush-genome [true p-plush-genome]
    :program [true p-program]
    :errors [false p-errors]
    :total-error [false p-total-error]
@@ -92,7 +96,7 @@
    :uuid [false p-uuid]
    :parent-uuids [false p-parent-uuids]
    :genetic-operators [false p-genetic-operators]
-   :is-random-replacement [false p-is-random-replacement]})
+   :is-random-replacement [false p-is-random-replacement]))
 
 (s/def ::individuals (s/coll-of ::individual :count 100)) ; 1000))
 (def p-individuals [true p-individual])
@@ -113,32 +117,38 @@
 (def p-outcome :string)
 (s/def ::lexicase (s/keys :opt-un [::best ::best-simplification]))
 (def p-lexicase
-  {:best [false p-best]
-   :best-simplification [false p-best-simplification]})
+  (array-map
+   :best [false p-best]
+   :best-simplification [false p-best-simplification]))
 (s/def ::report-time ::duration)
 (def p-report-time p-duration)
 (s/def ::problem-specific (s/keys :opt-un [::best-generalization-errors]))
 (def p-problem-specific
-  {:best-generalization-errors [false p-best-generalization-errors]})
+  (array-map
+   :best-generalization-errors [false p-best-generalization-errors]))
 
 (s/def ::report (s/keys :req-un [::outcome]
                         :opt-un [::best ::best-simplification ::lexicase ::report-time ::problem-specific]))
 (def p-report
-  {:outcome [true p-outcome]
+  (array-map
+   :outcome [true p-outcome]
    :best [false p-best]
    :best-simplification [false p-best-simplification]
    :lexicase [false p-lexicase]
    :report-time [false p-report-time]
-   :problem-specific [false p-problem-specific]})
+   :problem-specific [false p-problem-specific]))
 
 (s/def ::generation (s/keys :req-un [::individuals ::reproduction-time ::fitness-time ::other-time]
                             :opt-un [::report]))
 (def p-generation
-  {:individuals [true p-individuals]
+  (array-map
+   :individuals [true p-individuals]
    :reproduction-time [true p-reproduction-time]
    :fitness-time [true p-fitness-time]
    :other-time [true p-other-time]
-   :report [false p-report]})
+   :report [false p-report]))
 
 (def configuration-gen (s/gen ::configuration))
 (def generation-gen (s/gen ::generation))
+(def configuration-write-support (->write-support p-configuration))
+(def generation-write-support (->write-support p-generation))

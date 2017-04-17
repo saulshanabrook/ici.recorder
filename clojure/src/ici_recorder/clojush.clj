@@ -1,7 +1,8 @@
 (ns ici-recorder.clojush
-  (:require [ici-recorder.parquet.write :refer [write ->hadoop-config]]
-            [environ.core]
-            [taoensso.timbre.profiling :as profiling])
+  (:require [clojure.spec :as s]
+            [ici-recorder.parquet.write :refer [write ->hadoop-config]]
+            [ici-recorder.parquet.spec :as hadoop-s]
+            [environ.core])
   (:import (org.apache.hadoop.fs)
            (java.net)))
 
@@ -10,18 +11,16 @@
                     "fs.alluxio-ft.impl" "alluxio.hadoop.FaultTolerantFileSystem"
                     "fs.AbstractFileSystem.alluxio.impl" "alluxio.hadoop.AlluxioFileSystem"}))
 
-(def -base-uri (java.net.URI. (environ.core/env :clojush-parquet-uri "")))
-(def -fs (.getFileSystem (org.apache.hadoop.fs.Path. -base-uri) -hadoop-config))
+(def ^java.net.URI -base-uri (java.net.URI. (environ.core/env :clojush-parquet-uri "")))
+(def ^org.apache.hadoop.fs.FileSystem -fs (.getFileSystem (org.apache.hadoop.fs.Path. -base-uri) -hadoop-config))
 
 ; create the file at a temporary location, then move it.
 ; this is so that partially written files aren't in the path and won't break reading
-(defn -write [schema path form]
-  (let [uri (profiling/p :->uri
-              (org.apache.hadoop.fs.Path. (.resolve -base-uri path)))
-        tmp-uri (profiling/p :->uri
-                  (org.apache.hadoop.fs.Path. (.resolve -base-uri (str "tmp/" path))))]
+(defn -write [write-support ^String path form]
+  (let [uri (org.apache.hadoop.fs.Path. (.resolve -base-uri path))
+        tmp-uri (org.apache.hadoop.fs.Path. (.resolve -base-uri (str "tmp/" path)))]
     (write
-      schema
+      write-support
       form
       {:path tmp-uri
        :write-mode "OVERWRITE"
@@ -29,19 +28,23 @@
        :compression-codec "GZIP"
        :hadoop-config -hadoop-config})
 
-    (profiling/p :rename
-      (.rename -fs tmp-uri uri))))
+    (.rename -fs tmp-uri uri)
+    (.close -fs)))
 
-(defn record-run [schema uuid config]
+(s/fdef -write
+  :args (s/cat :write-support ::hadoop-s/write-support
+               :path any?
+               :form any?))
+
+
+(defn record-run [write-support uuid config]
   (-write
-    schema
-    (profiling/p :path-str
-      (str "configs/uuid=" uuid "/data.parquet"))
+    write-support
+    (str "configs/uuid=" uuid "/data.parquet")
     config))
 
-(defn record-generation [schema config-uuid index generation]
+(defn record-generation [write-support config-uuid index generation]
   (-write
-    schema
-    (profiling/p :path-str
-      (str "generations/run-uuid=" config-uuid "/" "index=" index "/data.parquet"))
+    write-support
+    (str "generations/run-uuid=" config-uuid "/" "index=" index "/data.parquet")
     generation))

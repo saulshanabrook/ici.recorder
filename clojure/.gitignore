@@ -15,3 +15,6 @@ myrepo
 clojush/
 generations/
 tmp/
+.nrepl-port
+configs/
+generations/

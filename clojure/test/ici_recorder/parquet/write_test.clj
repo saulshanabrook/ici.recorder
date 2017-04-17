@@ -15,7 +15,7 @@
   stest/instrument)
 
 
-(defn ->configuraiton [path]
+(defn ->configuraiton [^java.lang.String path]
   {:path (org.apache.hadoop.fs.Path. path)
    :write-mode "OVERWRITE"
    :validation true
@@ -25,11 +25,11 @@
 (t/deftest test-write
   (t/testing "configuration"
     (write
-      test-utils/p-configuration
+      test-utils/configuration-write-support
       (gen/generate test-utils/configuration-gen)
       (->configuraiton "config")))
   (t/testing "generation"
     (write
-      test-utils/p-generation
+      test-utils/generation-write-support
       (gen/generate test-utils/generation-gen)
       (->configuraiton "generation"))))
