@@ -12,14 +12,19 @@
                 ;  [com.fzakaria/slf4j-timbre "0.3.4"]
                 ;  [org.slf4j/log4j-over-slf4j "1.7.14"]
                  [org.alluxio/alluxio-core-client "dev"]
+                  ; :exclusions [org.slf4j/slf4j-api]]
                  [environ "1.1.0"]
                  [potemkin "0.4.3"]
                  [proto-repl "0.3.1"]
-                 [com.taoensso/timbre "4.10.0"]
+                ;  [com.taoensso/timbre "4.10.0"]
                  [org.clojure/test.check "0.9.0"]
-                 [criterium "0.4.4"]]
+                 [criterium "0.4.4"]
+                ;  [org.apache.logging.log4j/log4j-api "2.8.2"]
+                ;  [org.apache.logging.log4j/log4j-core "2.8.2"]
+                ;  [org.apache.logging.log4j/log4j-1.2-api "2.8.2"]]
+                 [ch.qos.logback/logback-classic "1.2.3"]]
 
-  :exclusions [org.slf4j/slf4j-log4j12]
+  ; :exclusions [org.slf4j/slf4j-log4j12]
   :managed-dependencies [; use the same version of this accross parquet and alluxio
                          [org.apache.hadoop/hadoop-common "2.2.0"]
                          ; force upgrade this to deal with
@@ -30,7 +35,8 @@
                                  :username :env/localrepo_username
                                  :password :env/localrepo_password}]]
 
-  :resource-paths ["alluxio-site.properties"]
+  :resource-paths ["alluxio-site.properties"
+                   "log4j2.xml"]
   :jvm-opts ^:replace ["-Xmx16G"
                        "-XX:+UseConcMarkSweepGC"
                        "-XX:+CMSClassUnloadingEnabled"
