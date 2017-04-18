@@ -1,10 +1,9 @@
 (ns ici-recorder.clojush-benchmark
   (:require [ici-recorder.clojush :refer [record-run record-generation]]
-            [taoensso.timbre :as timbre]
+            [ici-recorder :refer [->write-support]]
             [ici-recorder.test-utils :as test-utils]
             [clojure.spec.gen :as gen]
             [criterium.core :as criterium]))
-
 
 (defn -main []
   (clojure.spec.test/with-instrument-disabled

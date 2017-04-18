@@ -1,7 +1,7 @@
 (ns ici-recorder.parquet.schema.interop
   (:require [clojure.spec :as s]
             [clojure.spec.test :as stest]
-            
+
             [ici-recorder.parquet.schema.spec :as p]))
 
 
@@ -45,7 +45,7 @@
   :args (s/cat :map_ ::p/group))
 
 (defmethod ->type :group
-  [[required? group] name_]
+  [[required? group] ^String name_]
   (org.apache.parquet.schema.GroupType.
     (required?->repetition required?)
     name_
@@ -75,4 +75,3 @@
 
 (s/fdef ->schema
   :args (s/cat :root ::p/schema))
-

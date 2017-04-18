@@ -6,7 +6,7 @@
   (:require [clojure.spec :as s]
             ; [taoensso.timbre :as timbre]
             ; [taoensso.timbre.profiling :as profiling :refer [defnp p] :rename {p pp}]
-            [taoensso.timbre :refer [trace spy]]
+            ; [taoensso.timbre :refer [trace spy]]
 
             [ici-recorder.parquet.schema.spec :as p])
   (:import (org.apache.parquet.io.api)))
@@ -30,7 +30,7 @@
 (extend-protocol BooleanType
   Boolean
     (add-boolean [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (spy :trace (.addBoolean rc self)))
+      (.addBoolean rc self))
   Object
     (add-boolean [self rc]
       (add-boolean (boolean self) rc)))
@@ -38,7 +38,7 @@
 (extend-protocol IntegerType
   Integer
     (add-integer [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (spy :trace (.addInteger rc self)))
+      (.addInteger rc self))
   Object
     (add-integer [self rc]
       (add-integer (int self) rc)))
@@ -46,7 +46,7 @@
 (extend-protocol LongType
   Long
     (add-long [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (spy :trace (.addLong rc self)))
+      (.addLong rc self))
   Object
     (add-long [self rc]
       (add-long (long self) rc)))
@@ -54,7 +54,7 @@
 (extend-protocol FloatType
   Float
     (add-float [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (spy :trace (.addFloat rc self)))
+      (.addFloat rc self))
   Object
     (add-float [self rc]
       (add-float (float self) rc)))
@@ -62,7 +62,7 @@
 (extend-protocol DoubleType
   Double
     (add-double [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (spy :trace (.addDouble rc self)))
+      (.addDouble rc self))
   Object
     (add-double [self rc]
       (add-double (double self) rc)))
@@ -70,10 +70,9 @@
 (extend-protocol StringType
   String
     (add-string [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (spy :trace
-        (->> self
-          org.apache.parquet.io.api.Binary/fromString
-          (.addBinary rc))))
+      (->> self
+        org.apache.parquet.io.api.Binary/fromString
+        (.addBinary rc)))
   clojure.lang.Keyword
     (add-string [self rc]
       (add-string (name self) rc))
@@ -88,7 +87,7 @@
 
 (defn rc-form
   [method & arg-forms]
-  `(spy :trace (~method ~'rc ~@arg-forms)))
+  `(~method ~'rc ~@arg-forms))
 
 (defn group-forms
   [inner-forms]
@@ -146,7 +145,7 @@
   [not-nested
    form-symbol]
   (let [method-symbol (symbol "ici-recorder.parquet.add-data" (str "add-" (name not-nested)))]
-    `((spy :trace (~method-symbol ~form-symbol ~'rc)))))
+    `((~method-symbol ~form-symbol ~'rc))))
 
 (defmethod add-value-forms :group
   [group

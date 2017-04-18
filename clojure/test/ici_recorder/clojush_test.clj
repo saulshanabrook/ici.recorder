@@ -1,6 +1,5 @@
 (ns ici-recorder.clojush-test
   (:require [ici-recorder.clojush :refer [record-run, record-generation]]
-            [taoensso.timbre :as timbre]
             [clojure.test :as t]
             [ici-recorder.test-utils :as test-utils]
             [clojure.spec.gen :as gen]

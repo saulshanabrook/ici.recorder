@@ -25,7 +25,7 @@
     (self []
        this)))
 (s/fdef ->builder
-  :args (s/cat :write-support ::hadoop-s/write-support :path ::path))
+  :args (s/cat :write-support ::hadoop-s/write-support :path ::hadoop-s/path))
 
 
 (s/def ::hadoop (s/map-of string? string?))
