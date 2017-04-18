@@ -13,7 +13,7 @@
           (criterium/quick-bench
             (record-generation
               test-utils/generation-write-support
-              "test-uuid"
+              (str (java.util.UUID/randomUUID))
               0
               g)
             :verbose))
@@ -24,6 +24,6 @@
           (time
             (record-generation
               test-utils/generation-write-support
-              "test-uuid"
+              (str (java.util.UUID/randomUUID))
               0
               g)))))))
