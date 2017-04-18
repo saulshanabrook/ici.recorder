@@ -11,79 +11,30 @@
             [ici-recorder.parquet.schema.spec :as p])
   (:import (org.apache.parquet.io.api)))
 
-(defprotocol BooleanType
-  (add-boolean [self record-consumer]))
-(defprotocol IntegerType
-  (add-integer [self record-consumer]))
-(defprotocol LongType
-  (add-long [self record-consumer]))
-(defprotocol FloatType
-  (add-float [self record-consumer]))
-(defprotocol DoubleType
-  (add-double [self record-consumer]))
-(defprotocol StringType
-  (add-string [self record-consumer]))
-(defprotocol InstantType
-  (add-instant [self record-consumer]))
+(defn add-boolean [self ^org.apache.parquet.io.api.RecordConsumer rc]
+  (.addBoolean rc (boolean self)))
 
+(defn add-integer [self ^org.apache.parquet.io.api.RecordConsumer rc]
+  (.addInteger rc (int self)))
 
-(extend-protocol BooleanType
-  Boolean
-    (add-boolean [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (.addBoolean rc self))
-  Object
-    (add-boolean [self rc]
-      (add-boolean (boolean self) rc)))
+(defn add-long [self ^org.apache.parquet.io.api.RecordConsumer rc]
+  (.addLong rc (long self)))
 
-(extend-protocol IntegerType
-  Integer
-    (add-integer [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (.addInteger rc self))
-  Object
-    (add-integer [self rc]
-      (add-integer (int self) rc)))
+(defn add-float [self ^org.apache.parquet.io.api.RecordConsumer rc]
+  (.addFloat rc (float self)))
 
-(extend-protocol LongType
-  Long
-    (add-long [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (.addLong rc self))
-  Object
-    (add-long [self rc]
-      (add-long (long self) rc)))
+(defn add-double [self ^org.apache.parquet.io.api.RecordConsumer rc]
+  (.addDouble rc (double self)))
 
-(extend-protocol FloatType
-  Float
-    (add-float [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (.addFloat rc self))
-  Object
-    (add-float [self rc]
-      (add-float (float self) rc)))
+(defn add-string [self ^org.apache.parquet.io.api.RecordConsumer rc]
+  (->> self
+    ((if (keyword? self) name str))
+    org.apache.parquet.io.api.Binary/fromString
+    (.addBinary rc)))
 
-(extend-protocol DoubleType
-  Double
-    (add-double [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (.addDouble rc self))
-  Object
-    (add-double [self rc]
-      (add-double (double self) rc)))
+(defn add-instant [self ^org.apache.parquet.io.api.RecordConsumer rc]
+  (add-long self rc))
 
-(extend-protocol StringType
-  String
-    (add-string [self ^org.apache.parquet.io.api.RecordConsumer rc]
-      (->> self
-        org.apache.parquet.io.api.Binary/fromString
-        (.addBinary rc)))
-  clojure.lang.Keyword
-    (add-string [self rc]
-      (add-string (name self) rc))
-  Object
-    (add-string [self rc]
-      (add-string (str self) rc)))
-
-(extend-protocol InstantType
-  Long
-    (add-instant [self rc]
-      (add-long self rc)))
 
 (defn rc-form
   [method & arg-forms]
