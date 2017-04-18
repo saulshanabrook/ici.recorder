@@ -1,6 +1,7 @@
 (ns ici-recorder.test-utils
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
+            [environ.core]
 
             [ici-recorder.parquet.write-support :refer [->write-support]]))
 (s/def ::duration
@@ -98,7 +99,7 @@
    :genetic-operators [false p-genetic-operators]
    :is-random-replacement [false p-is-random-replacement]))
 
-(s/def ::individuals (s/coll-of ::individual :count 100)) ; 1000))
+(s/def ::individuals (s/coll-of ::individual :count (Integer/parseInt (environ.core/env :n-individuals "10"))))
 (def p-individuals [true p-individual])
 (s/def ::reproduction-time ::duration)
 (def p-reproduction-time p-duration)

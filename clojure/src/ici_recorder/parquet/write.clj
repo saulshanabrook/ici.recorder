@@ -24,7 +24,7 @@
       write-support)
     (self []
        this)))
-(s/fdef ->parquet-writer
+(s/fdef ->builder
   :args (s/cat :write-support ::hadoop-s/write-support :path ::path))
 
 

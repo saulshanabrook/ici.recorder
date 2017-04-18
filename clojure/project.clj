@@ -31,7 +31,7 @@
                                  :password :env/localrepo_password}]]
 
   :resource-paths ["alluxio-site.properties"]
-  :jvm-opts ^:replace [;"-Xmx32G"
+  :jvm-opts ^:replace ["-Xmx16G"
                        "-XX:+UseConcMarkSweepGC"
                        "-XX:+CMSClassUnloadingEnabled"
                        "-Xverify:none"]

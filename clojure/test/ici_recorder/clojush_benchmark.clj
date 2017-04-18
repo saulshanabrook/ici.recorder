@@ -9,20 +9,22 @@
 (defn -main []
   (clojure.spec.test/with-instrument-disabled
     (let [g (gen/generate test-utils/generation-gen)]
-      ; (println "Ready...")
-      ; (read-line)
-      ; (println "Starting")
-      ; (time
-      ;   (record-generation
-      ;     test-utils/generation-write-support
-      ;     "test-uuid"
-      ;     0
-      ;     g))))))
-      (criterium/with-progress-reporting
-        (criterium/quick-bench
-          (record-generation
-            test-utils/generation-write-support
-            "test-uuid"
-            0
-            g)
-          :verbose)))))
+      (if (read-string (environ.core/env :benchmark "false"))
+        (criterium/with-progress-reporting
+          (criterium/quick-bench
+            (record-generation
+              test-utils/generation-write-support
+              "test-uuid"
+              0
+              g)
+            :verbose))
+        (do
+          (println "Ready...")
+          (read-line)
+          (println "Starting")
+          (time
+            (record-generation
+              test-utils/generation-write-support
+              "test-uuid"
+              0
+              g)))))))
