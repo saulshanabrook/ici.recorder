@@ -12,13 +12,13 @@
                     "fs.AbstractFileSystem.alluxio.impl" "alluxio.hadoop.AlluxioFileSystem"}))
 
 (def ^java.net.URI -base-uri (java.net.URI. (environ.core/env :clojush-parquet-uri "")))
-(def ^org.apache.hadoop.fs.FileSystem -fs (.getFileSystem (org.apache.hadoop.fs.Path. -base-uri) -hadoop-config))
 
 ; create the file at a temporary location, then move it.
 ; this is so that partially written files aren't in the path and won't break reading
 (defn -write [write-support ^String path form]
   (let [uri (org.apache.hadoop.fs.Path. (.resolve -base-uri path))
-        tmp-uri (org.apache.hadoop.fs.Path. (.resolve -base-uri (str "tmp/" path)))]
+        tmp-uri (org.apache.hadoop.fs.Path. (.resolve -base-uri (str "tmp/" path)))
+        ^org.apache.hadoop.fs.FileSystem fs (.getFileSystem (org.apache.hadoop.fs.Path. -base-uri) -hadoop-config)]
     (write
       write-support
       form
@@ -28,8 +28,9 @@
        :compression-codec "SNAPPY"
        :hadoop-config -hadoop-config})
 
-    (.rename -fs tmp-uri uri)
-    (.close -fs)))
+    (.mkdirs fs (.getParent uri))
+    (assert (.rename fs tmp-uri uri))
+    (.close fs)))
 
 (s/fdef -write
   :args (s/cat :write-support ::hadoop-s/write-support
