@@ -17,8 +17,7 @@
 ; this is so that partially written files aren't in the path and won't break reading
 (defn -write [write-support ^String path form]
   (let [uri (org.apache.hadoop.fs.Path. (.resolve -base-uri path))
-        tmp-uri (org.apache.hadoop.fs.Path. (.resolve -base-uri (str "tmp/" path)))
-        ^org.apache.hadoop.fs.FileSystem fs (.getFileSystem (org.apache.hadoop.fs.Path. -base-uri) -hadoop-config)]
+        tmp-uri (org.apache.hadoop.fs.Path. (.resolve -base-uri (str "tmp/" path)))]
     (write
       write-support
       form
@@ -28,9 +27,10 @@
        :compression-codec "SNAPPY"
        :hadoop-config -hadoop-config})
 
-    (.mkdirs fs (.getParent uri))
-    (assert (.rename fs tmp-uri uri))
-    (.close fs)))
+    (let [^org.apache.hadoop.fs.FileSystem fs (.getFileSystem (org.apache.hadoop.fs.Path. -base-uri) -hadoop-config)]
+      (.mkdirs fs (.getParent uri))
+      (assert (.rename fs tmp-uri uri))
+      (.close fs))))
 
 (s/fdef -write
   :args (s/cat :write-support ::hadoop-s/write-support
