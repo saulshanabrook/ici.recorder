@@ -35,8 +35,7 @@
                                  :username :env/localrepo_username
                                  :password :env/localrepo_password}]]
 
-  :resource-paths ["alluxio-site.properties"
-                   "log4j2.xml"]
+  :resource-paths ["alluxio-site.properties"]
   :jvm-opts ^:replace ["-Xmx16G"
                        "-XX:+UseConcMarkSweepGC"
                        "-XX:+CMSClassUnloadingEnabled"
