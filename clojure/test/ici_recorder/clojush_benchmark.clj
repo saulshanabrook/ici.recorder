@@ -18,12 +18,13 @@
               g)
             :verbose))
         (do
-          (println "Ready...")
-          (read-line)
-          (println "Starting")
-          (time
-            (record-generation
-              test-utils/generation-write-support
-              (str (java.util.UUID/randomUUID))
-              0
-              g)))))))
+            (dotimes [_ 2]
+              (println "Ready...")
+              (read-line)
+              (println "Starting")
+              (time
+                (record-generation
+                  test-utils/generation-write-support
+                  (str (java.util.UUID/randomUUID))
+                  0
+                  g))))))))
