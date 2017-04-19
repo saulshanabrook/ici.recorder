@@ -25,8 +25,8 @@
                  [ch.qos.logback/logback-classic "1.2.3"]]
 
   ; :exclusions [org.slf4j/slf4j-log4j12]
-  :managed-dependencies [; use the same version of this accross parquet and alluxio
-                         [org.apache.hadoop/hadoop-common "2.2.0"]
+  :managed-dependencies [; use the same version of this as parquet-hadoop
+                         [org.apache.hadoop/hadoop-common "2.3.0"]
                          ; force upgrade this to deal with
                          ; https://github.com/ptaoussanis/carmine/issues/5
                          [org.xerial.snappy/snappy-java "1.1.4-M3"]]
