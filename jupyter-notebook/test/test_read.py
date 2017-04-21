@@ -8,11 +8,12 @@ spark = pyspark.sql.SparkSession.builder \
 
 base_uri = os.environ['CLOJUSH-PARQUET-URI']
 configs = spark.read.parquet(base_uri + "configs")
+generations = spark.read.parquet(base_uri + "generations")
 
 class TestReadConfigs(unittest.TestCase):
 
-    def test_configs_contains(self):
-        self.assertEqual(
-            configs.collect(),
-             [pyspark.sql.Row(uuid="uuid", name="hi")]
-        )
+    def test_config_exists(self):
+        self.assertTrue(configs.collect())
+
+    def test_generation_exists(self):
+        self.assertTrue(generations.collect())
