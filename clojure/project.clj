@@ -11,7 +11,6 @@
                  [org.apache.parquet/parquet-hadoop "1.9.0"]
                 ;  [com.fzakaria/slf4j-timbre "0.3.4"]
                 ;  [org.slf4j/log4j-over-slf4j "1.7.14"]
-                 [org.alluxio/alluxio-core-client "dev"]
                   ; :exclusions [org.slf4j/slf4j-api]]
                  [environ "1.1.0"]
                  [potemkin "0.4.3"]
@@ -22,7 +21,8 @@
                 ;  [org.apache.logging.log4j/log4j-api "2.8.2"]
                 ;  [org.apache.logging.log4j/log4j-core "2.8.2"]
                 ;  [org.apache.logging.log4j/log4j-1.2-api "2.8.2"]]
-                 [ch.qos.logback/logback-classic "1.2.3"]]
+                 [ch.qos.logback/logback-classic "1.2.3"]
+                 [org.apache.hadoop/hadoop-client "2.3.0"]]
 
   ; :exclusions [org.slf4j/slf4j-log4j12]
   :managed-dependencies [; use the same version of this as parquet-hadoop
@@ -34,8 +34,6 @@
                                  ;; provide these so doesn't iteractivly ask for config
                                  :username :env/localrepo_username
                                  :password :env/localrepo_password}]]
-
-  :resource-paths ["alluxio-site.properties"]
   :jvm-opts ^:replace ["-Xmx16G"
                        "-XX:+UseConcMarkSweepGC"
                        "-XX:+CMSClassUnloadingEnabled"

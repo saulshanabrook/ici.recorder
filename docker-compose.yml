@@ -22,41 +22,34 @@ services:
         published: 80
         protocol: tcp
         mode: ingress
-  alluxio-master:
-    image: icirecorder/alluxio:${TAG:-latest}
+  hadoop-namenode:
+    image: icirecorder/hadoop:${TAG:-latest}
     build:
-      context: alluxio-server
-    command: [master]
-    environment:
-      ALLUXIO_MASTER_HOSTNAME: ${SERVER_HOST:-alluxio-master}
-      ALLUXIO_WORKER_HOSTNAME: ${SERVER_HOST:-alluxio-worker}
+      context: hadoop
+    command: [namenode]
     volumes:
-      - alluxio:/under
+      - hdfs-namenode:/tmp/hadoop-root/dfs/name
     expose:
-      - 19998
-      - 19999
+      - 50070
+      - 90000
+      - 8022
     ports:
-      - "19998:19998"
-      - "19999:19999"
-
-  alluxio-worker:
-    image: icirecorder/alluxio:${TAG:-latest}
+      - "50070:50070"
+      - "9000:9000"
+      - "8022:8022"
+  hadoop-datanode:
+    image: icirecorder/hadoop:${TAG:-latest}
     build:
-      context: alluxio-server
-    command: [worker]
-    environment:
-      ALLUXIO_MASTER_HOSTNAME: ${SERVER_HOST:-alluxio-master}
-      ALLUXIO_WORKER_HOSTNAME: ${SERVER_HOST:-alluxio-worker}
-    volumes:
-      - alluxio:/under
+     context: hadoop
+    command: [datanode]
     expose:
-      - 29998
-      - 29999
-      - 30000
+      - 50010
+      - 50020
+      - 50075
     ports:
-      - "29998:29998"
-      - "29999:29999"
-      - "30000:30000"
+      - "50075:50075"
+    volumes:
+     - hdfs-datanode:/data
   cadvisor:
     image: google/cadvisor:latest
     ports:
@@ -68,4 +61,5 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
 volumes:
   notebooks:
-  alluxio:
+  hdfs-namenode:
+  hdfs-datanode:

@@ -7,9 +7,7 @@
            (java.net)))
 
 (def -hadoop-config
-  (->hadoop-config {"fs.alluxio.impl" "alluxio.hadoop.FileSystem"
-                    "fs.alluxio-ft.impl" "alluxio.hadoop.FaultTolerantFileSystem"
-                    "fs.AbstractFileSystem.alluxio.impl" "alluxio.hadoop.AlluxioFileSystem"}))
+  (->hadoop-config {}))
 
 (def ^java.net.URI -base-uri (java.net.URI. (environ.core/env :clojush-parquet-uri "")))
 
