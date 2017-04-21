@@ -24,7 +24,7 @@
                  [ch.qos.logback/logback-classic "1.2.3"]
                  [org.apache.hadoop/hadoop-client "2.3.0"]]
 
-  ; :exclusions [org.slf4j/slf4j-log4j12]
+  :exclusions [org.slf4j/slf4j-log4j12]
   :managed-dependencies [; use the same version of this as parquet-hadoop
                          [org.apache.hadoop/hadoop-common "2.3.0"]
                          ; force upgrade this to deal with

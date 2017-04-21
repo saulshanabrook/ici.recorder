@@ -49,19 +49,58 @@
       <value>174.63.121.205:9000</value>
     </property> -->
 
-
+<!--
     <property>
       <name>dfs.datanode.address</name>
-      <value>hadoop-datanode:50010</value>
+      <value>datanode.ici.com:50010</value>
     </property>
     <property>
       <name>dfs.datanode.ipc.address</name>
-      <value>hadoop-datanode:50020</value>
-    </property>
+      <value>datanode.ici.com:50020</value>
+    </property> -->
 
     <!-- https://log.rowanto.com/why-datanode-is-denied-communication-with-namenode/ -->
-    <property>
+    <!-- <property>
       <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
       <value>false</value>
     </property>
+
+
+    <property>
+      <name>dfs.namenode.rpc-bind-host</name>
+      <value>0.0.0.0</value>
+      <description>
+        The actual address the RPC server will bind to. If this optional address is
+        set, it overrides only the hostname portion of dfs.namenode.rpc-address.
+        It can also be specified per name node or name service for HA/Federation.
+        This is useful for making the name node listen on all interfaces by
+        setting it to 0.0.0.0.
+      </description>
+    </property>
+
+    <property>
+      <name>dfs.namenode.servicerpc-bind-host</name>
+      <value>0.0.0.0</value>
+      <description>
+        The actual address the service RPC server will bind to. If this optional address is
+        set, it overrides only the hostname portion of dfs.namenode.servicerpc-address.
+        It can also be specified per name node or name service for HA/Federation.
+        This is useful for making the name node listen on all interfaces by
+        setting it to 0.0.0.0.
+      </description>
+    </property>
+
+    <property>
+      <name>dfs.namenode.http-bind-host</name>
+      <value>0.0.0.0</value>
+      <description>
+        The actual adress the HTTP server will bind to. If this optional address
+        is set, it overrides only the hostname portion of dfs.namenode.http-address.
+        It can also be specified per name node or name service for HA/Federation.
+        This is useful for making the name node HTTP server listen on all
+        interfaces by setting it to 0.0.0.0.
+      </description>
+    </property> -->
+
+
 </configuration>

@@ -7,10 +7,10 @@ services:
     volumes:
       - ./jupyter-notebook/test:/tmp/test
     environment:
-      CLOJUSH-PARQUET-URI: "hdfs://hadoop-namenode:9000/clojush/"
+      CLOJUSH-PARQUET-URI: "hdfs://hadoop-namenode:8020/clojush/"
   test-clojure:
     build: clojure
     volumes:
       - ./clojure:/usr/src/app/
     environment:
-      CLOJUSH-PARQUET-URI: "hdfs://hadoop-namenode:9000/clojush/"
+      CLOJUSH-PARQUET-URI: "hdfs://hadoop-namenode:8020/clojush/"

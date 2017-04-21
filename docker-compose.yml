@@ -31,23 +31,26 @@ services:
       - hdfs-namenode:/tmp/hadoop-root/dfs/name
     expose:
       - 50070
-      - 90000
+      - 8020
       - 8022
     ports:
       - "50070:50070"
-      - "9000:9000"
+      - "8020:8020"
       - "8022:8022"
   hadoop-datanode:
     image: icirecorder/hadoop:${TAG:-latest}
     build:
      context: hadoop
     command: [datanode]
+    hostname: ${SERVER_HOST}
     expose:
       - 50010
       - 50020
       - 50075
     ports:
       - "50075:50075"
+      - "50010:50010"
+      - "50020:50020"
     volumes:
      - hdfs-datanode:/data
   cadvisor:

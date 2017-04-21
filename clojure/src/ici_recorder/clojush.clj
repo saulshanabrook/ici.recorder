@@ -7,7 +7,8 @@
            (java.net)))
 
 (def -hadoop-config
-  (->hadoop-config {}))
+  (->hadoop-config
+    {"dfs.client.use.datanode.hostname" "true"}))
 
 (def ^java.net.URI -base-uri (java.net.URI. (environ.core/env :clojush-parquet-uri "")))
 
