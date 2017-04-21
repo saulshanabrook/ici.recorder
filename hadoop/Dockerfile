@@ -9,5 +9,9 @@ RUN wget -q http://www-us.apache.org/dist/hadoop/common/hadoop-${VERSION}/hadoop
  && rm hadoop-${VERSION}.tar.gz
 
 WORKDIR hadoop-${VERSION}
+
+RUN ["./bin/hdfs", "namenode", "-format", "fun"]
+VOLUME "/tmp/hadoop-root/dfs/name"
+
 COPY core-site.xml hdfs-site.xml etc/hadoop/
 ENTRYPOINT ["./bin/hdfs"]

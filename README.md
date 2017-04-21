@@ -11,7 +11,6 @@ at Hampshire College](http://faculty.hampshire.edu/lspector/ici.html).
 
 ## Testing
 ```bash
-docker-compose run --rm hadoop-namenode namenode -format fun
 docker-compose up -d hadoop-namenode hadoop-datanode
 docker-compose run --rm test-clojure
 docker-compose run --rm test-jupyter-notebook
