@@ -19,25 +19,11 @@ before_install:
   - chmod +x docker-compose-new
 
 before_script:
-  - ./docker-compose-new build build-alluxio
-  - mkdir alluxio-out
-  - ./docker-compose-new run --rm -T build-alluxio | tar -zxC alluxio-out -f -
-
-
-  - cp alluxio-out/core/client/target/alluxio-core-client-1.5.0-SNAPSHOT-jar-with-dependencies.jar jupyter-notebook/alluxio.jar
-  - cp alluxio-out/core/client/target/alluxio-core-client-1.5.0-SNAPSHOT-jar-with-dependencies.jar clojure/alluxio.jar
-  - cp -r alluxio-out/ alluxio-server/alluxio-out
-
-  - cp alluxio/alluxio-site.properties alluxio-server/
-  - cp alluxio/alluxio-site.properties clojure/
-  - cp alluxio/alluxio-site.properties jupyter-notebook/
-
-  - ./docker-compose-new build alluxio-worker alluxio-master test-alluxio
-  - ./docker-compose-new up -d alluxio-worker alluxio-master
+  - ./docker-compose-new build hadoop-namenode hadoop-datanode
+  - ./docker-compose-new up -d hadoop-namenode hadoop-datanode
   - ./docker-compose-new build jupyter-notebook test-jupyter-notebook
   - ./docker-compose-new build test-clojure
 script:
-  - ./docker-compose-new run --rm test-alluxio
   - ./docker-compose-new run --rm test-clojure
   - ./docker-compose-new run --rm test-jupyter-notebook
 
