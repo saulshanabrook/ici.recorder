@@ -1,4 +1,4 @@
-(defproject ici.recorder "0.1.0-SNAPSHOT"
+(defproject ici.recorder "0.2.0"
   :description "FIXME: write description"
   :url "http://saulshanabrook.com/ici.recorder"
   :license {:name "Eclipse Public License"
