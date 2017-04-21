@@ -1,4 +1,4 @@
-(defproject ici.recorder "0.2.0"
+(defproject ici.recorder "0.2.0-1-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://saulshanabrook.com/ici.recorder"
   :license {:name "Eclipse Public License"
@@ -49,6 +49,6 @@
                   ["shell" "git" "tag" "${:version}"]
                   ["deploy"]
                   ["change" "version" "leiningen.release/bump-version" "qualifier"]
-                  ["shell" "git" "tag" "${:version}"]
+                  ["shell" "git" "commit" "-am" "Version ${:version} [ci skip]"]
                   ["shell" "git" "push" "--tags"]]
   :global-vars {*warn-on-reflection* true})
