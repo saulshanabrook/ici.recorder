@@ -16,7 +16,7 @@
 ; this is so that partially written files aren't in the path and won't break reading
 (defn -write [write-support ^String path form]
   (let [uri (org.apache.hadoop.fs.Path. (.resolve -base-uri path))
-        tmp-uri (org.apache.hadoop.fs.Path. (.resolve -base-uri (str "tmp/" path)))]
+        tmp-uri (org.apache.hadoop.fs.Path. (str "/tmp/clojush/" path))]
     (write
       write-support
       form
@@ -27,8 +27,7 @@
        :hadoop-config -hadoop-config})
 
     (let [^org.apache.hadoop.fs.FileSystem fs (.getFileSystem (org.apache.hadoop.fs.Path. -base-uri) -hadoop-config)]
-      (.mkdirs fs (.getParent uri))
-      (assert (.rename fs tmp-uri uri))
+      (.moveFromLocalFile fs tmp-uri uri)
       (.close fs))))
 
 (s/fdef -write

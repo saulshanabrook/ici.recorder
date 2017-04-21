@@ -18,7 +18,7 @@
               g)
             :verbose))
         (do
-            (dotimes [_ 2]
+            (dotimes [_ 10]
               (println "Ready...")
               (read-line)
               (println "Starting")
