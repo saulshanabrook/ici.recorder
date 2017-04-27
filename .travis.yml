@@ -19,15 +19,9 @@ before_install:
   - chmod +x docker-compose-new
 
 before_script:
-  - ./docker-compose-new build hadoop-namenode hadoop-datanode
-  - ./docker-compose-new up -d hadoop-namenode hadoop-datanode
-  - ./docker-compose-new build jupyter-notebook test-jupyter-notebook
-  - ./docker-compose-new build test-clojure
+  - ./docker-compose-new build jupyter-notebook
+  - ./docker-compose-new build server
 script:
-  - ./docker-compose-new run --rm test-clojure
-  - ./docker-compose-new run --rm test-jupyter-notebook
-
-after_success:
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
   - ./docker-compose-new push
   - TAG=latest ./docker-compose-new push

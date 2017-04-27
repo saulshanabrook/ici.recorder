@@ -11,48 +11,47 @@ services:
   #     - "/var/run/docker.sock:/var/run/docker.sock:rw"
   #   ports:
   #    - "443:443"
+  # server-configs:
+  #   build: server
+  #   image: icirecorder/server:${TAG:-latest}
+  #   expose:
+  #     - 9990
+  #   ports:
+  #     - "9990:9990"
+  #   environment:
+  #     PORT: 9990
+  #     FOLDER: /output
+  #   volumes:
+  #     - configs:/output
+  server:
+    build: server
+    image: icirecorder/server:${TAG:-latest}
+    expose:
+      - 9990
+    ports:
+      - "9990:9990"
+    environment:
+      PORT: 9990
+      FOLDER: /output
+    volumes:
+      - input:/output
   jupyter-notebook:
     build: jupyter-notebook
     image: icirecorder/jupyter-notebook:${TAG:-latest}
     volumes:
       - notebooks:/home/jovyan/work
+      - jupyter-settings:/home/jovyan/.jupyter/nbconfig
+      - input:/input
+      - output:/output
     command: start-notebook.sh --NotebookApp.password='sha1:b689bdb78b77:c2e53af00e537fd286497049896c4487d69b6089'
-    ports:
-      - target: 8888
-        published: 80
-        protocol: tcp
-        mode: ingress
-  hadoop-namenode:
-    image: icirecorder/hadoop:${TAG:-latest}
-    build:
-      context: hadoop
-    command: [namenode]
-    volumes:
-      - hdfs-namenode:/tmp/hadoop-root/dfs/name
+    environment:
+      INPUT_FOLDER: /input/final
+      OUTPUT_FOLDER: /output/
     expose:
-      - 50070
-      - 8020
-      - 8022
+      - 4040
     ports:
-      - "50070:50070"
-      - "8020:8020"
-      - "8022:8022"
-  hadoop-datanode:
-    image: icirecorder/hadoop:${TAG:-latest}
-    build:
-     context: hadoop
-    command: [datanode]
-    hostname: ${SERVER_HOST}
-    expose:
-      - 50010
-      - 50020
-      - 50075
-    ports:
-      - "50075:50075"
-      - "50010:50010"
-      - "50020:50020"
-    volumes:
-     - hdfs-datanode:/data
+      - "8888:8888"
+      - "4040:4040"
   cadvisor:
     image: google/cadvisor:latest
     ports:
@@ -64,5 +63,6 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
 volumes:
   notebooks:
-  hdfs-namenode:
-  hdfs-datanode:
+  jupyter-settings:
+  input:
+  output:

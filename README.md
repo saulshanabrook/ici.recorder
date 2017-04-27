@@ -15,3 +15,12 @@ docker-compose up -d hadoop-namenode hadoop-datanode
 docker-compose run --rm test-clojure
 docker-compose run --rm test-jupyter-notebook
 ```
+
+
+## Helpful commands
+
+Copy all data to local machine
+
+```bash
+docker-compose run --no-deps --rm -v (pwd):/data/ hadoop-namenode dfs -D dfs.client.use.datanode.hostname=true -copyToLocal hdfs://$REMOTE_HOST:8020/clojush/ /data/
+```
