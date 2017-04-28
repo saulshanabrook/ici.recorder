@@ -30,6 +30,6 @@ COPY requirements.conda.txt requirements.conda.txt
 RUN conda install -y --channel conda-forge --file requirements.conda.txt
 
 # modified to add more memory
-ENV SPARK_OPTS  --driver-memory 6g --driver-java-options=-Xms8G --driver-java-options=-Xmx8G --driver-java-options=-Dlog4j.logLevel=info
+ENV SPARK_OPTS  --driver-memory 3g --driver-java-options=-Xms3G --driver-java-options=-Xmx3G --driver-java-options=-Dlog4j.logLevel=info
 
 USER ${NB_USER}

@@ -20,7 +20,9 @@ before_install:
 
 before_script:
   - ./docker-compose-new build jupyter-notebook
+  - TAG=latest ./docker-compose-new build jupyter-notebook
   - ./docker-compose-new build server
+  - TAG=latest ./docker-compose-new build server
 script:
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
   - ./docker-compose-new push
