@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net"
 	"os"
 	"path"
@@ -12,8 +13,7 @@ import (
 
 func handleErr(err error) {
 	if err != nil {
-		fmt.Println(err)
-		panic(err)
+		log.Panic(err)
 	}
 }
 
@@ -30,6 +30,8 @@ func listen(lines chan<- []byte) {
 		// The loop then returns to accepting, so that
 		// multiple connections may be served concurrently.
 		go func(c net.Conn) {
+			log.Println("Opening connection")
+			defer log.Println("Closing connection")
 			defer c.Close()
 			rd := bufio.NewReader(c)
 			for {
@@ -66,7 +68,7 @@ func write(lines <-chan []byte) {
 		i++
 		ioutil.WriteFile(checkpointPath, []byte{byte(i)}, 0777)
 		handleErr(os.Rename(tmpPath, path))
-
+		log.Printf("Saved line %v", i)
 	}
 }
 

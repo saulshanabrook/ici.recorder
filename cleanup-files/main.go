@@ -1,19 +1,24 @@
 // parses the checkpoint for a spark job and deletes the files after they
 // have been processed
 //
-// every 10 seconds it:
-//   1. reads every file in the directory starts with an integer (ignores temp files)
-//   2. parses them all for paths and batchIDs
-//   3. goes through all files and tries to delete
+// every 100 seconds it:
+//   1. Finds the file with the largest integer in the commits folder
+//   2. reads all sources <= that file, stopping at a `.compact` source, which contains all previous numbers
+//   2. For each commit, reads the source with that number
+//   3. parses that source for files
+//   4. deletes all the files delete
 package main
 
 import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 )
 
@@ -21,8 +26,7 @@ var checkpointFolder = os.Getenv("CHECKPOINT_FOLDER")
 
 func handleErr(err error) {
 	if err != nil {
-		fmt.Println(err)
-		panic(err)
+		log.Panic(err)
 	}
 }
 
@@ -31,13 +35,13 @@ func processStreamedFile(uri string) {
 	handleErr(err)
 	err = os.Remove(u.Path)
 	if err == nil {
-		fmt.Printf("Deletedg %v\n", u.Path)
+		log.Printf("Deletedg %v", u.Path)
 	} else if !os.IsNotExist(err) {
 		handleErr(err)
 	}
 }
 func processCheckpointFile(path string) {
-	fmt.Printf("Processing checkpoint %v...\n", path)
+	log.Printf("Processing checkpoint %v...", path)
 	f, err := os.Open(path)
 	defer f.Close()
 	handleErr(err)
@@ -58,24 +62,45 @@ func processCheckpointFile(path string) {
 	}
 }
 
-func scan() {
-	pattern := filepath.Join(
-		checkpointFolder,
-		"sources",
-		"0",
-		"[0-9]*",
-	)
-	fmt.Printf("Scanning pattern %v...\n", pattern)
-	matches, err := filepath.Glob(pattern)
+func mostRecentCommit() (maxCommit int) {
+	files, err := ioutil.ReadDir(filepath.Join(checkpointFolder, "commits"))
 	handleErr(err)
-	for _, path := range matches {
+	for _, file := range files {
+		i, err := strconv.Atoi(filepath.Base(file.Name()))
+		handleErr(err)
+		if i > maxCommit {
+			maxCommit = i
+		}
+	}
+	return
+}
+
+func isCompact(commit int) bool {
+	return commit%10 == 9
+}
+func scan() {
+	commit := mostRecentCommit()
+	for ; commit >= 0; commit-- {
+		path := filepath.Join(
+			checkpointFolder,
+			"sources",
+			"0",
+			strconv.Itoa(commit),
+		)
+		if isCompact(commit) {
+			path = fmt.Sprintf("%v.compact", path)
+		}
 		processCheckpointFile(path)
+		if isCompact(commit) {
+			break
+		}
+
 	}
 }
 
 func main() {
 	for {
 		scan()
-		time.Sleep(10 * time.Second)
+		time.Sleep(100 * time.Second)
 	}
 }
