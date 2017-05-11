@@ -35,14 +35,14 @@ services:
       FOLDER: /output
     volumes:
       - input:/output
-  cleanup-files:
-    build: cleanup-files
-    image: icirecorder/cleanup-files:${TAG:-latest}
-    environment:
-      CHECKPOINT_FOLDER: /output/generations_checkpoint
-    volumes:
-      - input:/input
-      - output:/output
+  # cleanup-files:
+  #   build: cleanup-files
+  #   image: icirecorder/cleanup-files:${TAG:-latest}
+  #   environment:
+  #     CHECKPOINT_FOLDER: /output/generations_checkpoint
+  #   volumes:
+  #     - input:/input
+  #     - output:/output
   jupyter-notebook:
     build: jupyter-notebook
     image: icirecorder/jupyter-notebook:${TAG:-latest}
