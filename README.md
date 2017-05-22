@@ -11,16 +11,19 @@ at Hampshire College](http://faculty.hampshire.edu/lspector/ici.html).
 
 ## Testing
 ```bash
-docker-compose up -d hadoop-namenode hadoop-datanode
-docker-compose run --rm test-clojure
-docker-compose run --rm test-jupyter-notebook
+docker-compose up
 ```
 
 
-## Helpful commands
-
-Copy all data to local machine
+## Deploying
 
 ```bash
-docker-compose run --no-deps --rm -v (pwd):/data/ hadoop-namenode dfs -D dfs.client.use.datanode.hostname=true -copyToLocal hdfs://$REMOTE_HOST:8020/clojush/ /data/
+set -x TAG temp.xxx
+docker-compose build
+docker-compose push
+
+# new 
+eval (docker-machine env deucalion)
+docker stack deploy -c docker-compose.yml ici-recorder
+
 ```

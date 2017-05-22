@@ -26,12 +26,13 @@ services:
   server:
     build: server
     image: icirecorder/server:${TAG:-latest}
-    expose:
-      - 9990
     ports:
-      - "9990:9990"
+      - target: 4370
+        published: 4370
+        protocol: tcp
+        mode: host
     environment:
-      PORT: 9990
+      PORT: 4370
       FOLDER: /output
     volumes:
       - input:/output
@@ -55,10 +56,11 @@ services:
     environment:
       INPUT_FOLDER: /input/final
       OUTPUT_FOLDER: /output/
+      SPARK_OPTS: --driver-memory 24g --driver-java-options=-Xms24G --driver-java-options=-Xmx24G --driver-java-options=-Dlog4j.logLevel=info
     expose:
       - 4040
     ports:
-      - "8888:8888"
+      - "80:8888"
       - "4040:4040"
   cadvisor:
     image: google/cadvisor:latest
