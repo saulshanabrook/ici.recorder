@@ -9,6 +9,8 @@ import (
 	"net"
 	"os"
 	"path"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 func handleErr(err error) {
@@ -53,22 +55,15 @@ func write(lines <-chan []byte) {
 	os.Mkdir(finalFolder, 0777)
 	tmpFolder := path.Join(folder, "tmp")
 	os.Mkdir(tmpFolder, 0777)
-	checkpointPath := path.Join(folder, "checkpoint")
-	iBytes, err := ioutil.ReadFile(checkpointPath)
-	var i int
-	if err == nil {
-		i = int(iBytes[0])
-	}
 	for line := range lines {
+		u := uuid.NewV4()
 		// create as tempfile
-		tmpPath := path.Join(tmpFolder, fmt.Sprint(i))
+		tmpPath := path.Join(tmpFolder, fmt.Sprint(u))
 		handleErr(ioutil.WriteFile(tmpPath, line, 0777))
 		// move so that it ends up there atomicaly
-		path := path.Join(finalFolder, fmt.Sprintf("%v.json", i))
-		i++
-		ioutil.WriteFile(checkpointPath, []byte{byte(i)}, 0777)
+		path := path.Join(finalFolder, fmt.Sprintf("%v.json", u))
 		handleErr(os.Rename(tmpPath, path))
-		log.Printf("Saved line %v", i)
+		log.Printf("Saved line %v", u)
 	}
 }
 
