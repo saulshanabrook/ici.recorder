@@ -13,10 +13,10 @@ RUN echo 'deb http://cdn-fastly.deb.debian.org/debian jessie-backports main' > /
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 RUN cd /tmp && \
-        wget -q http://people.apache.org/~pwendell/spark-nightly/spark-branch-2.2-bin/spark-2.2.0-SNAPSHOT-2017_04_24_14_16-cf16c32-bin/spark-2.2.0-SNAPSHOT-bin-hadoop2.7.tgz && \
-        tar xzf spark-2.2.0-SNAPSHOT-bin-hadoop2.7.tgz -C /usr/local && \
-        rm spark-2.2.0-SNAPSHOT-bin-hadoop2.7.tgz
-RUN cd /usr/local && ln -s spark-2.2.0-SNAPSHOT-bin-hadoop2.7 spark
+        wget -q http://people.apache.org/~pwendell/spark-nightly/spark-branch-2.2-bin/spark-2.2.1-SNAPSHOT-2017_05_12_02_33-21764f8-bin/spark-2.2.1-SNAPSHOT-bin-hadoop2.7.tgz && \
+        tar xzf spark-2.2.1-SNAPSHOT-bin-hadoop2.7.tgz -C /usr/local && \
+        rm spark-2.2.1-SNAPSHOT-bin-hadoop2.7.tgz
+RUN cd /usr/local && ln -s spark-2.2.1-SNAPSHOT-bin-hadoop2.7 spark
 
 
 # to fix docker volume thing
