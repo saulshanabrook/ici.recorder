@@ -5,15 +5,15 @@
 
 For recording experiments at the [Institute for Computational Intelligence
 at Hampshire College](http://faculty.hampshire.edu/lspector/ici.html).
+Currently, it's status is best documented [in a blog post](https://medium.com/@saulshanabrook/data-at-hampshire-ici-8f0e0c064f14).
 
-*This is a proof of concept. If it works out, then I will clean up code, add some tests, and extract reusable contents to another repo*
+It is not being used by members of the group yet.
 
 
 ## Testing
 ```bash
 docker-compose up
 ```
-
 
 ## Deploying
 
@@ -22,8 +22,6 @@ set -x TAG temp.xxx
 docker-compose build
 docker-compose push
 
-# new 
 eval (docker-machine env deucalion)
 docker stack deploy -c docker-compose.yml ici-recorder
-
 ```
